@@ -1,0 +1,40 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grillixGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#315B0B" />
+      <stop offset="100%" stop-color="#244507" />
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A8E83C" />
+      <stop offset="100%" stop-color="#78BD1C" />
+    </linearGradient>
+  </defs>
+  <!-- Background with rounded squircles -->
+  <rect width="512" height="512" rx="128" fill="url(#grillixGrad)" />
+  
+  <!-- Stylized GRILLIX Leaf & Organic Emblem -->
+  <path d="M140 372 C140 190, 372 138, 372 138 C372 138, 372 320, 140 372 Z" fill="url(#leafGrad)" />
+  <path d="M140 372 C220 310, 290 260, 335 180" stroke="#244507" stroke-width="18" stroke-linecap="round" />
+  <path d="M210 320 L270 330" stroke="#244507" stroke-width="14" stroke-linecap="round" />
+  <path d="M255 275 L315 285" stroke="#244507" stroke-width="14" stroke-linecap="round" />
+  <path d="M295 230 L345 238" stroke="#244507" stroke-width="14" stroke-linecap="round" />
+
+  <!-- Inner Sparkle -->
+  <circle cx="390" cy="120" r="14" fill="#A8E83C" />
+  <circle cx="410" cy="148" r="8" fill="#A8E83C" opacity="0.8" />
+</svg>`;
+
+const iconDir = path.resolve('public/icons');
+if (!fs.existsSync(iconDir)) {
+  fs.mkdirSync(iconDir, { recursive: true });
+}
+
+fs.writeFileSync(path.join(iconDir, 'icon.svg'), iconSvg);
+fs.writeFileSync(path.join(iconDir, 'apple-touch-icon.png'), iconSvg);
+fs.writeFileSync(path.join(iconDir, 'icon-192.png'), iconSvg);
+fs.writeFileSync(path.join(iconDir, 'icon-512.png'), iconSvg);
+
+console.log('PWA icons created in public/icons/');

@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-grillix-olive: #315B0B;
+    --color-grillix-forest: #244507;
+    --color-grillix-lime: #A8E83C;
+    --color-grillix-bg: #EEF4E3;
+    --color-grillix-card: #E3EBD3;
+    --color-grillix-text: #243019;
+    --color-grillix-secondary: #747B68;
+    --color-grillix-border: #D0D8C2;
+  }
+
+  body {
+    background-color: #EEF4E3;
+    color: #243019;
+    font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #D0D8C2;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #315B0B;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .text-grillix-headline {
+    letter-spacing: -0.03em;
+  }
+}
+
+/* Map Grid Pattern */
+.bg-map-pattern {
+  background-color: #385514;
+  background-image: 
+    radial-gradient(#4b6e1b 1px, transparent 1px),
+    linear-gradient(to right, rgba(75, 110, 27, 0.4) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(75, 110, 27, 0.4) 1px, transparent 1px);
+  background-size: 32px 32px, 48px 48px, 48px 48px;
+}
+
+/* Glassmorphism subtle overlay */
+.glass-pill {
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.glass-pill-dark {
+  background: rgba(36, 69, 7, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Floating bottom nav bar style */
+.floating-bottom-nav {
+  box-shadow: 0 10px 30px -5px rgba(36, 69, 7, 0.2);
+}
+
+/* Animations */
+@keyframes pulseSubtle {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s ease-in-out infinite;
+}
+
