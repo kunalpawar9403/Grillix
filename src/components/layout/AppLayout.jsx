@@ -5,8 +5,7 @@ import { DesktopFooter } from './DesktopFooter';
 import { MobileBottomNav } from '../common/MobileBottomNav';
 import { MobileStatusBar } from '../common/MobileStatusBar';
 import { Toast } from '../common/Toast';
-import { ScanMobileModal } from '../common/ScanMobileModal';
-import { QrCode } from 'lucide-react';
+import { MobilePwaDownloadModal } from '../common/MobilePwaDownloadModal';
 
 import { HomeScreen } from '../../pages/HomeScreen';
 import { DiscoveryScreen } from '../../pages/DiscoveryScreen';
@@ -26,9 +25,7 @@ export const AppLayout = () => {
   const { 
     currentScreen, 
     deviceMode, 
-    setDeviceMode,
-    isScanModalOpen,
-    setIsScanModalOpen
+    setDeviceMode
   } = useApp();
 
   const renderActiveScreen = () => {
@@ -69,19 +66,11 @@ export const AppLayout = () => {
     return (
       <div className="min-h-screen bg-[#DDE7CD] flex flex-col items-center justify-start py-6 px-4 selection:bg-[#A8E83C]">
         <Toast />
-        <ScanMobileModal isOpen={isScanModalOpen} onClose={() => setIsScanModalOpen(false)} />
+        <MobilePwaDownloadModal />
 
-        {/* Floating Top Control for Device Toggle & PWA Scan */}
+        {/* Floating Top Control for Device Toggle */}
         <div className="mb-6 bg-[#244507] text-[#EEF4E3] px-5 py-2.5 rounded-full shadow-lg flex items-center space-x-3 border border-[#315B0B] z-50">
           <span className="text-xs font-bold text-[#A8E83C]">iPhone 15 Pro Mode</span>
-          <button
-            onClick={() => setIsScanModalOpen(true)}
-            className="text-xs bg-[#A8E83C] text-[#244507] hover:bg-white px-3 py-1 rounded-full font-extrabold transition-all flex items-center space-x-1"
-            title="Scan QR Code to open on physical phone"
-          >
-            <QrCode size={13} />
-            <span>Scan on Real Phone</span>
-          </button>
           <button
             onClick={() => setDeviceMode('responsive')}
             className="text-xs bg-[#315B0B] hover:bg-[#A8E83C] hover:text-[#244507] text-white px-3 py-1 rounded-full font-bold transition-all"
@@ -114,7 +103,9 @@ export const AppLayout = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#EEF4E3] text-[#243019] relative w-full max-w-full overflow-x-hidden">
       <Toast />
-      <ScanMobileModal isOpen={isScanModalOpen} onClose={() => setIsScanModalOpen(false)} />
+      
+      {/* PWA Download Modal: Only opens on mobile view when website loads, never for desktop */}
+      <MobilePwaDownloadModal />
       
       {/* Desktop Header - Hidden on Mobile to give 100% native phone experience */}
       <div className="hidden md:block">
@@ -129,20 +120,6 @@ export const AppLayout = () => {
       {/* Floating Bottom Navigation on mobile/tablet */}
       <div className="md:hidden">
         <MobileBottomNav />
-      </div>
-
-      {/* Floating Quick Scan PWA Pill on Desktop */}
-      <div className="hidden lg:block fixed bottom-6 right-6 z-40">
-        <button
-          onClick={() => setIsScanModalOpen(true)}
-          className="bg-[#244507] hover:bg-[#315B0B] text-[#A8E83C] border-2 border-[#A8E83C]/40 px-4 py-3 rounded-full shadow-2xl flex items-center space-x-2.5 text-xs font-extrabold transition-all hover:scale-105 active:scale-95 group"
-          title="Open Scannable PWA QR Code for mobile"
-        >
-          <div className="w-7 h-7 rounded-full bg-[#A8E83C] text-[#244507] flex items-center justify-center group-hover:rotate-12 transition-transform">
-            <QrCode size={15} strokeWidth={2.5} />
-          </div>
-          <span>Scan to Test on Phone</span>
-        </button>
       </div>
 
       {/* Responsive Desktop Footer - Hidden on Mobile */}

@@ -3,7 +3,6 @@ import {
   Search, 
   Sparkles, 
   Plus, 
-  Scan, 
   Clock, 
   ChevronRight,
   ShoppingBag,
@@ -21,7 +20,6 @@ export const HomeScreen = () => {
     setSearchQuery, 
     showToast,
     setSelectedProduct,
-    setIsScanModalOpen,
     currentUser,
     cartItemCount
   } = useApp();
@@ -119,18 +117,8 @@ export const HomeScreen = () => {
           </div>
         </button>
 
-        {/* Right Side: Scan, Cart & Login / User Account */}
+        {/* Right Side: Cart & Login / User Account */}
         <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-          {/* Scanner / QR icon button */}
-          <button 
-            onClick={() => setIsScanModalOpen(true)}
-            className="w-9 h-9 rounded-full bg-[#244507]/15 hover:bg-[#244507]/25 backdrop-blur-md border border-[#244507]/20 flex items-center justify-center text-[#244507] active:scale-95 transition-all shadow-xs shrink-0"
-            aria-label="Scan in store & mobile PWA"
-            title="Scan & View on Mobile PWA"
-          >
-            <Scan size={16} strokeWidth={2.2} />
-          </button>
-
           {/* Cart Bag button with live badge */}
           <button
             onClick={() => navigateTo('cart')}
