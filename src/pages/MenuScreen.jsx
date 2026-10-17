@@ -12,7 +12,9 @@ import {
   Soup,
   CupSoda,
   Wheat,
-  Plus
+  Plus,
+  Bell,
+  UtensilsCrossed
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { FOOD_ITEMS } from '../data/mockData';
@@ -27,7 +29,9 @@ export const MenuScreen = () => {
     setSearchQuery, 
     cartItemCount, 
     cartTotal,
-    menuItems = FOOD_ITEMS
+    menuItems = FOOD_ITEMS,
+    currentTable,
+    callWaiter
   } = useApp();
 
   const [activeCategory, setActiveCategory] = useState('Featured');
@@ -79,31 +83,41 @@ export const MenuScreen = () => {
     <div className="w-full min-h-screen pb-28 md:pb-16 animate-fadeIn bg-[#EEF4E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-6">
         
-        {/* Top App Bar */}
-        <div className="flex items-center justify-between mb-4">
+        {/* Top App Bar with Table & Dine-In Status */}
+        <div className="flex items-center justify-between mb-4 gap-2">
           <button
             onClick={goBack}
-            className="w-10 h-10 rounded-full bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] flex items-center justify-center text-[#243019] transition-all active:scale-95 shadow-xs"
+            className="w-10 h-10 rounded-full bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] flex items-center justify-center text-[#243019] transition-all active:scale-95 shadow-xs shrink-0 cursor-pointer"
             aria-label="Back"
           >
             <ChevronLeft size={20} />
           </button>
 
-          <div className="text-center">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#315B0B] block">
-              GRILLIX KITCHEN
+          <div className="text-center min-w-0">
+            <span className="inline-flex items-center space-x-1.5 text-[10px] font-black uppercase tracking-wider bg-[#E3EBD3] border border-[#315B0B]/30 px-2.5 py-0.5 rounded-full text-[#244507] shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#315B0B] animate-pulse"></span>
+              <span>Table #{currentTable} • Dine-In</span>
             </span>
-            <h1 className="text-lg sm:text-xl font-extrabold text-[#243019] tracking-tight">
-              Chef's Seasonal Menu
+            <h1 className="text-base sm:text-xl font-extrabold text-[#243019] tracking-tight truncate mt-0.5">
+              Digital Menu Card
             </h1>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 shrink-0">
+            <button
+              onClick={() => callWaiter('Assistance')}
+              className="w-10 h-10 rounded-full bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] text-[#244507] flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
+              title="Call server to your table"
+              aria-label="Call Server"
+            >
+              <Bell size={17} className="text-[#315B0B]" />
+            </button>
+
             <button
               onClick={() => navigateTo('cart')}
-              className="relative w-10 h-10 rounded-full bg-[#244507] text-[#A8E83C] flex items-center justify-center transition-all active:scale-95 shadow-xs"
+              className="relative w-10 h-10 rounded-full bg-[#244507] text-[#A8E83C] hover:bg-[#315B0B] flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
               aria-label="Shopping Bag Cart"
-              title="View Cart"
+              title={`View Table #${currentTable} Order`}
             >
               <ShoppingBag size={18} strokeWidth={2.2} />
               {cartItemCount > 0 && (

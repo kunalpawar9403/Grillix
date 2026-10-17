@@ -12,7 +12,9 @@ import {
   Clock,
   Award,
   ExternalLink,
-  Shield
+  Shield,
+  Bell,
+  UtensilsCrossed
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { RESTAURANTS } from '../../data/mockData';
@@ -30,6 +32,7 @@ export const DesktopHeader = () => {
     setSearchQuery,
     currentUser,
     currentTable,
+    callWaiter,
     logout
   } = useApp();
 
@@ -207,172 +210,66 @@ export const DesktopHeader = () => {
             )}
           </form>
 
-          {/* Signed In State vs Signed Out State */}
-          {currentUser?.isLoggedIn ? (
-            <>
-              {/* Loyalty Points Pill */}
-              <button
-                onClick={() => navigateTo('rewards')}
-                className="hidden sm:flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D8E2C6] border border-[#D0D8C2] px-2.5 py-1.5 rounded-full text-xs font-bold text-[#244507] transition-all whitespace-nowrap shrink-0"
-                title="Your Rewards Balance"
-              >
-                <Sparkles size={12} className="text-[#315B0B]" />
-                <span>{userPoints.toLocaleString()}</span>
-                <span className="text-[10px] text-[#747B68] font-semibold">PTS</span>
-              </button>
+          {/* Dedicated Restaurant Dine-In Controls (No Profile Needed) */}
+          <div className="flex items-center space-x-2 shrink-0">
+            {/* Dine-In Active Table Badge */}
+            <button
+              onClick={() => navigateTo('cart')}
+              className="flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D8E2C6] border border-[#315B0B]/30 px-3.5 py-1.5 rounded-full text-xs font-black text-[#244507] transition-all shadow-xs shrink-0 cursor-pointer"
+              title={`Dine-in active at Table #${currentTable} - Tap to view order`}
+            >
+              <span className="w-2.5 h-2.5 rounded-full bg-[#315B0B] animate-pulse"></span>
+              <span className="tracking-tight uppercase">Table #{currentTable}</span>
+            </button>
 
+            {/* Quick Call Server Button */}
+            <button
+              onClick={() => callWaiter('Assistance')}
+              className="hidden sm:flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] px-3 py-1.5 rounded-full text-xs font-bold text-[#244507] transition-all shrink-0 active:scale-95 cursor-pointer shadow-xs"
+              title="Call waiter/server to your table"
+            >
+              <Bell size={13} className="text-[#315B0B]" />
+              <span>Call Server</span>
+            </button>
 
+            {/* Kitchen Orders Tracker Link */}
+            <button
+              onClick={() => navigateTo('order-tracking')}
+              className="hidden md:flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] px-3 py-1.5 rounded-full text-xs font-bold text-[#244507] transition-all shrink-0 active:scale-95 cursor-pointer shadow-xs"
+              title="Track live kitchen preparation progress"
+            >
+              <Clock size={13} className="text-[#315B0B]" />
+              <span>Kitchen Status</span>
+            </button>
 
-              {/* Dine-In Table Badge */}
-              <button
-                onClick={() => navigateTo('cart')}
-                className="flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D8E2C6] border border-[#315B0B]/30 px-3 py-1 rounded-full text-xs font-black text-[#244507] transition-all shadow-2xs shrink-0"
-                title={`Dine-in active at Table #${currentTable}`}
-              >
-                <span className="w-2 h-2 rounded-full bg-[#315B0B] animate-pulse"></span>
-                <span>Table #{currentTable}</span>
-              </button>
+            {/* Cart Bag Button (Send to Kitchen) */}
+            <button
+              onClick={() => navigateTo('cart')}
+              className="relative w-9 h-9 rounded-full bg-[#244507] text-[#A8E83C] hover:bg-[#315B0B] transition-colors focus:outline-none shadow-sm active:scale-95 flex items-center justify-center shrink-0 cursor-pointer"
+              aria-label="View Kitchen Order"
+              title="View Table Order / Cart"
+            >
+              <ShoppingBag size={16} />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-[#A8E83C] text-[#0F2002] font-black text-xs leading-none rounded-full flex items-center justify-center border-2 border-white shadow-md ring-1 ring-black/15 select-none animate-scale">
+                  {cartItemCount}
+                </span>
+              )}
+            </button>
 
-              {/* Cart Bag Button */}
-              <button
-                onClick={() => navigateTo('cart')}
-                className="relative w-8 h-8 rounded-full bg-[#244507] text-[#A8E83C] hover:bg-[#315B0B] transition-colors focus:outline-none shadow-sm active:scale-95 flex items-center justify-center shrink-0"
-                aria-label="Shopping Bag"
-                title="Shopping Bag"
-              >
-                <ShoppingBag size={15} />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-4.5 px-1 bg-[#A8E83C] text-[#0F2002] font-black text-[10px] leading-none rounded-full flex items-center justify-center border-2 border-white shadow-md select-none animate-scale">
-                    {cartItemCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Profile Avatar with Dropdown */}
-              <div ref={userMenuRef} className="relative shrink-0">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center space-x-1.5 bg-[#E3EBD3]/80 hover:bg-[#D8E2C6] border border-[#D0D8C2] pl-1 pr-2 py-0.5 rounded-full group focus:outline-none transition-all shadow-xs"
-                  title="My Account Menu"
-                >
-                  <div className="relative">
-                    <img
-                      src={currentUser.avatar || '/images/avatar-jhon.jpg'}
-                      alt={currentUser.name}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = '/images/avatar-jhon.jpg';
-                      }}
-                      className="w-6 h-6 rounded-full object-cover border border-[#315B0B]"
-                    />
-                    <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#A8E83C] border border-white"></span>
-                  </div>
-                  <span className="text-xs font-bold text-[#243019] max-w-[75px] truncate">
-                    {currentUser.name.split(' ')[0]}
-                  </span>
-                  <ChevronDown size={12} className={`text-[#747B68] transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {/* Dropdown Menu */}
-                {userMenuOpen && (
-                  <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-[#D0D8C2] py-2 z-50 animate-fadeIn">
-                    <div className="px-4 py-2 border-b border-[#EEF4E3]">
-                      <p className="text-xs font-bold text-[#243019] truncate">{currentUser.name}</p>
-                      <p className="text-[11px] text-[#747B68] truncate">{currentUser.email}</p>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        navigateTo('account');
-                        setUserMenuOpen(false);
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-xs font-semibold text-[#243019] hover:bg-[#EEF4E3] flex items-center space-x-2.5 transition-colors"
-                    >
-                      <User size={15} className="text-[#315B0B]" />
-                      <span>Profile & Diet Tags</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        navigateTo('rewards');
-                        setUserMenuOpen(false);
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-xs font-semibold text-[#243019] hover:bg-[#EEF4E3] flex items-center space-x-2.5 transition-colors"
-                    >
-                      <Award size={15} className="text-[#315B0B]" />
-                      <span>Rewards ({userPoints} PTS)</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        navigateTo('order-tracking');
-                        setUserMenuOpen(false);
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-xs font-semibold text-[#243019] hover:bg-[#EEF4E3] flex items-center space-x-2.5 transition-colors"
-                    >
-                      <Clock size={15} className="text-[#315B0B]" />
-                      <span>Order Tracking</span>
-                    </button>
-
-                    <a
-                      href={getAdminUrl()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="w-full px-4 py-2.5 text-left text-xs font-bold text-[#243019] hover:bg-[#EEF4E3] flex items-center justify-between transition-colors"
-                      title="Open Kitchen Partner Console"
-                    >
-                      <div className="flex items-center space-x-2.5">
-                        <Shield size={15} className="text-[#315B0B]" />
-                        <span>Partner Console</span>
-                      </div>
-                      <ExternalLink size={12} className="text-[#747B68]" />
-                    </a>
-
-                    <div className="my-1 border-t border-[#EEF4E3]"></div>
-
-                    <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        logout();
-                      }}
-                      className="w-full px-4 py-2.5 text-left text-xs font-bold text-red-600 hover:bg-red-50 flex items-center space-x-2.5 transition-colors"
-                    >
-                      <LogOut size={15} />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Cart Bag Button */}
-              <button
-                onClick={() => navigateTo('cart')}
-                className="relative w-9 h-9 rounded-full bg-[#244507] text-[#A8E83C] hover:bg-[#315B0B] transition-colors focus:outline-none shadow-sm active:scale-95 flex items-center justify-center shrink-0"
-                aria-label="Shopping Bag"
-                title="Shopping Bag"
-              >
-                <ShoppingBag size={17} />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-[#A8E83C] text-[#0F2002] font-black text-xs leading-none rounded-full flex items-center justify-center border-2 border-white shadow-md ring-1 ring-black/15 select-none animate-scale">
-                    {cartItemCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Sign In / Register Button */}
-              <button
-                onClick={() => navigateTo('auth')}
-                className="inline-flex items-center space-x-1.5 px-4 py-2 rounded-full bg-[#315B0B] hover:bg-[#244507] text-white text-xs font-extrabold transition-all shadow-sm active:scale-95 shrink-0"
-                title="Sign In or Register"
-              >
-                <User size={13} />
-                <span>Log In</span>
-              </button>
-            </>
-          )}
+            {/* Kitchen Admin Portal Link */}
+            <a
+              href={getAdminUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden xl:flex items-center space-x-1.5 bg-[#244507]/10 hover:bg-[#244507]/20 border border-[#315B0B]/20 px-3 py-1.5 rounded-full text-[11px] font-bold text-[#315B0B] transition-colors"
+              title="Open Kitchen Management & KDS"
+            >
+              <Shield size={12} />
+              <span>Kitchen Display</span>
+              <ExternalLink size={10} className="text-[#747B68]" />
+            </a>
+          </div>
 
 
           {/* Mobile hamburger menu toggle */}

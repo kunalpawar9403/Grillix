@@ -21,7 +21,8 @@ export const HomeScreen = () => {
     showToast,
     setSelectedProduct,
     currentUser,
-    cartItemCount
+    cartItemCount,
+    currentTable
   } = useApp();
 
   const [activeSearch, setActiveSearch] = useState('');
@@ -134,40 +135,16 @@ export const HomeScreen = () => {
             )}
           </button>
 
-          {/* Login or User Profile on Right */}
-          {currentUser?.isLoggedIn ? (
-            <button 
-              onClick={() => navigateTo('account')} 
-              className="flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] pl-1 pr-2.5 py-1 rounded-full text-xs font-bold text-[#243019] shadow-xs active:scale-95 transition-all shrink-0"
-              aria-label="User Account"
-              title="My Account"
-            >
-              <div className="relative">
-                <img
-                  src={currentUser.avatar || '/images/avatar-jhon.jpg'}
-                  alt={currentUser.name}
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = '/images/avatar-jhon.jpg';
-                  }}
-                  className="w-7 h-7 rounded-full object-cover border border-[#315B0B]"
-                />
-                <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-[#A8E83C] border border-[#EEF4E3]"></span>
-              </div>
-              <span className="max-w-[70px] truncate text-xs font-bold text-[#244507]">
-                {currentUser.name.split(' ')[0]}
-              </span>
-            </button>
-          ) : (
-            <button
-              onClick={() => navigateTo('auth')}
-              className="flex items-center space-x-1.5 bg-[#315B0B] hover:bg-[#244507] text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-xs active:scale-95 transition-all shrink-0"
-              aria-label="Sign In"
-            >
-              <LogIn size={13} strokeWidth={2.4} />
-              <span>Log In</span>
-            </button>
-          )}
+          {/* Dine-In Table Badge on Right (No Profile Needed) */}
+          <button 
+            onClick={() => navigateTo('cart')} 
+            className="flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#315B0B]/30 px-3 py-1.5 rounded-full text-xs font-black text-[#244507] shadow-xs active:scale-95 transition-all shrink-0 cursor-pointer"
+            aria-label="Table Order"
+            title={`Dine-in Table #${currentTable}`}
+          >
+            <span className="w-2 h-2 rounded-full bg-[#315B0B] animate-pulse"></span>
+            <span>Table #{currentTable}</span>
+          </button>
         </div>
       </div>
 

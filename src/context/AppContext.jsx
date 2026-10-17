@@ -81,12 +81,18 @@ export const INITIAL_ORDERS = [
 ];
 
 export const AppProvider = ({ children }) => {
-  // Navigation & Screen management
-  const [activeTab, setActiveTab] = useState('home');
-  const [currentScreen, setCurrentScreen] = useState('home'); 
+  // Navigation & Screen management: Default to 'menu' so scanning table QR immediately opens digital Menu Card!
+  const [activeTab, setActiveTab] = useState('menu');
+  const [currentScreen, setCurrentScreen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('table')) return 'menu';
+    }
+    return 'menu';
+  }); 
   
   // Navigation history for back button support
-  const [screenHistory, setScreenHistory] = useState(['home']);
+  const [screenHistory, setScreenHistory] = useState(['menu']);
 
   // Selected Entities
   const [selectedRestaurant, setSelectedRestaurant] = useState(RESTAURANT || RESTAURANTS[0]);
@@ -223,12 +229,13 @@ export const AppProvider = ({ children }) => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const urlTable = params.get('table');
-      if (urlTable && urlTable !== currentTable) {
+      if (urlTable) {
         setCurrentTable(urlTable);
         try {
           localStorage.setItem('grillix_dinein_table', urlTable);
         } catch {}
-        showToast(`🍽️ Welcome! Dine-In Table #${urlTable} selected`);
+        setCurrentScreen('menu');
+        showToast(`🍽️ Table #${urlTable} Connected • Digital Menu Ready!`);
       }
     }
   }, []);
