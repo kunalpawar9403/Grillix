@@ -297,10 +297,87 @@ export const AdminProvider = ({ children }) => {
     } catch {}
   }, [coupons]);
 
-  // Live sync from Frontend API (http://localhost:5174/api/orders, /api/kitchen-status & /api/restaurant-settings)
+  // Real-time cross-tab and cross-device sync
+  useEffect(() => {
+    // 1. Listen for new orders and status updates on BroadcastChannel
+    let bc = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        bc = new BroadcastChannel('grillix_sync_channel');
+        bc.onmessage = (event) => {
+          if (event.data?.type === 'NEW_ORDER') {
+            const newOrder = event.data.order;
+            if (newOrder && newOrder.id) {
+              setAllOrders(prev => {
+                if (prev.some(o => o.id === newOrder.id)) return prev;
+                playAdminAlertSound();
+                showToast(`🔔 New Order #${newOrder.id} received from Storefront! Total: ₹${newOrder.total}`);
+                const nextOrders = [newOrder, ...prev];
+                try {
+                  localStorage.setItem('grillix_admin_orders', JSON.stringify(nextOrders));
+                } catch {}
+                return nextOrders;
+              });
+            }
+          } else if (event.data?.type === 'ORDER_STATUS_UPDATE') {
+            const { orderId, status } = event.data;
+            setAllOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+          }
+        };
+      }
+    } catch (e) {}
+
+    // 2. Listen for changes in localStorage from other tabs
+    const handleStorageChange = (e) => {
+      if (e.key === 'grillix_admin_orders' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setAllOrders(prev => {
+              const prevIds = new Set(prev.map(o => o.id));
+              const newlyAdded = parsed.filter(o => o && o.id && !prevIds.has(o.id));
+              if (newlyAdded.length > 0) {
+                playAdminAlertSound();
+                showToast(`🔔 New Order #${newlyAdded[0].id} received from Storefront! Total: ₹${newlyAdded[0].total}`);
+              }
+              return parsed;
+            });
+          }
+        } catch {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      if (bc) bc.close();
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  // Live sync from Frontend API (http://localhost:5174/api/orders or /api/orders on Vercel)
   useEffect(() => {
     const syncFromFrontend = async () => {
       try {
+        // Also check if localStorage has orders that aren't in state
+        try {
+          const localSaved = localStorage.getItem('grillix_admin_orders');
+          if (localSaved) {
+            const parsed = JSON.parse(localSaved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setAllOrders(prev => {
+                const prevIds = new Set(prev.map(o => o.id));
+                const newlyAdded = parsed.filter(o => o && o.id && !prevIds.has(o.id));
+                if (newlyAdded.length > 0) {
+                  playAdminAlertSound();
+                  showToast(`🔔 New Order #${newlyAdded[0].id} received from Storefront! Total: ₹${newlyAdded[0].total}`);
+                  return parsed;
+                }
+                return prev;
+              });
+            }
+          }
+        } catch {}
+
         const [ordersRes, statusRes, settingsRes] = await Promise.allSettled([
           fetch(`${getApiBase()}/api/orders`),
           fetch(`${getApiBase()}/api/kitchen-status`),
@@ -311,11 +388,23 @@ export const AdminProvider = ({ children }) => {
           const liveOrders = await ordersRes.value.json();
           if (Array.isArray(liveOrders) && liveOrders.length > 0) {
             setAllOrders(prev => {
-              if (prev.length > 0 && liveOrders.length > prev.length) {
+              const map = new Map();
+              // Live orders from API
+              liveOrders.forEach(o => { if (o && o.id) map.set(o.id, o); });
+              // Keep any existing local orders
+              prev.forEach(o => { if (o && o.id && !map.has(o.id)) map.set(o.id, o); });
+              const merged = Array.from(map.values());
+
+              const prevIds = new Set(prev.map(o => o.id));
+              const newlyAdded = merged.filter(o => o && o.id && !prevIds.has(o.id));
+              if (newlyAdded.length > 0) {
                 playAdminAlertSound();
-                showToast(`🔔 New Order #${liveOrders[0].id} received from Storefront! Total: ₹${liveOrders[0].total}`);
+                showToast(`🔔 New Order #${newlyAdded[0].id} received from Storefront! Total: ₹${newlyAdded[0].total}`);
               }
-              return liveOrders;
+              try {
+                localStorage.setItem('grillix_admin_orders', JSON.stringify(merged));
+              } catch {}
+              return merged;
             });
           }
         }
@@ -367,9 +456,22 @@ export const AdminProvider = ({ children }) => {
 
   // 1. ORDERS ACTIONS
   const updateOrderStatus = (orderId, newStatus) => {
-    setAllOrders((prev) =>
-      prev.map((ord) => (ord.id === orderId ? { ...ord, status: newStatus } : ord))
-    );
+    setAllOrders((prev) => {
+      const next = prev.map((ord) => (ord.id === orderId ? { ...ord, status: newStatus } : ord));
+      try {
+        localStorage.setItem('grillix_admin_orders', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+
+    // Broadcast across tabs
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const bc = new BroadcastChannel('grillix_sync_channel');
+        bc.postMessage({ type: 'ORDER_STATUS_UPDATE', orderId, status: newStatus });
+        bc.close();
+      }
+    } catch {}
 
     // Sync to Frontend API so customer tracking advances in real time
     fetch(`${getApiBase()}/api/orders`, {

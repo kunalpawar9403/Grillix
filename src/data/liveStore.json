@@ -1,13 +1,30 @@
 {
   "orders": [
     {
+      "id": "1095288944025",
+      "customerName": "Kunal Pawar",
+      "customerPhone": "+91 98201 44321",
+      "address": "Flat 502, Green Meadows Residency, Spine Road, Moshi, Pune 412105",
+      "date": "Just now",
+      "total": 338,
+      "subtotal": 299,
+      "deliveryFee": 39,
+      "status": "Delivered",
+      "items": [
+        "Rainbow Veggie Quinoa Power Bowl"
+      ],
+      "assignedRider": "Vikram Singh",
+      "paymentMethod": "UPI (Google Pay)",
+      "deliveryNotes": "Leave at front door"
+    },
+    {
       "id": "GRX-IND-101",
       "customerName": "Aarav Mehta",
       "customerPhone": "+91 98331 22441",
       "address": "Villa 12, Palm Meadows, Whitefield, Bengaluru 560066",
       "date": "Today, 12:45 PM",
       "total": 518,
-      "status": "Delivering",
+      "status": "Delivered",
       "items": [
         "Golden Sesame Crispy Tofu Bowl",
         "Green Veggie Bowl"
@@ -23,7 +40,7 @@
       "address": "Flat 701, Riverdale Heights, Koregaon Park, Pune 411001",
       "date": "Today, 12:50 PM",
       "total": 319,
-      "status": "Preparing",
+      "status": "Delivered",
       "items": [
         "Herb & Bean Patty Sandwich"
       ],
@@ -38,7 +55,7 @@
       "address": "Tower B-402, DLF Phase 5, Golf Course Rd, Gurugram 122009",
       "date": "Today, 12:55 PM",
       "total": 279,
-      "status": "Received",
+      "status": "Delivered",
       "items": [
         "Avocado Citrus & Baby Fennel Salad"
       ],
@@ -82,5 +99,5 @@
     "deliveryEnabled": true,
     "announcement": "🌿 Using 100% hydroponic organic greens and cold-pressed olive oils in Moshi, Pune!"
   },
-  "lastUpdated": "2026-10-17T11:55:00.000Z"
+  "lastUpdated": "2026-10-17T12:38:31.963Z"
 }
