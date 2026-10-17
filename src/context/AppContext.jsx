@@ -198,7 +198,42 @@ export const AppProvider = ({ children }) => {
     return INITIAL_ORDERS;
   });
 
-  // Delivery Fleet Partners
+  // Dine-In Table Selection (auto-detected from URL ?table=X or localStorage)
+  const [currentTable, setCurrentTable] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const urlTable = params.get('table');
+        if (urlTable) {
+          localStorage.setItem('grillix_dinein_table', urlTable);
+          return urlTable;
+        }
+        const saved = localStorage.getItem('grillix_dinein_table');
+        if (saved) return saved;
+      } catch {}
+    }
+    return '1';
+  });
+
+  // Special kitchen instructions for chef
+  const [chefNotes, setChefNotes] = useState('');
+
+  // Auto-detect table from URL parameter on initial load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlTable = params.get('table');
+      if (urlTable && urlTable !== currentTable) {
+        setCurrentTable(urlTable);
+        try {
+          localStorage.setItem('grillix_dinein_table', urlTable);
+        } catch {}
+        showToast(`🍽️ Welcome! Dine-In Table #${urlTable} selected`);
+      }
+    }
+  }, []);
+
+  // Delivery Fleet Partners (empty fallback for legacy references)
   const [deliveryRiders, setDeliveryRiders] = useState(INITIAL_RIDERS);
 
   // Kitchen Online / Paused status
@@ -564,7 +599,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Calculations with Live Admin Delivery Control
+  // Calculations for Dine-In Table Ordering (Zero delivery fee!)
   const cartSubtotal = cart.reduce((acc, curr) => acc + (curr.item.menuPrice * curr.quantity), 0);
   const cartItemCount = cart.reduce((acc, curr) => acc + curr.quantity, 0);
   
@@ -574,22 +609,37 @@ export const AppProvider = ({ children }) => {
     else if (appliedPromo.discountPercent) discountAmount = (cartSubtotal * appliedPromo.discountPercent) / 100;
   }
 
-  const freeDeliveryThreshold = restaurantSettings?.freeDeliveryThreshold ?? 499;
-  const configuredDeliveryFee = restaurantSettings?.deliveryFee ?? 39;
-  const isDeliveryFree = cartSubtotal >= freeDeliveryThreshold || appliedPromo?.code === 'FREEDEL';
-  const deliveryFee = cart.length === 0 ? 0 : (isDeliveryFree ? 0 : configuredDeliveryFee);
-  const freeDeliveryRemaining = Math.max(0, freeDeliveryThreshold - cartSubtotal);
-  const minOrderValue = restaurantSettings?.minOrderValue ?? 149;
-  const cartTotal = Math.max(0, cartSubtotal - discountAmount + deliveryFee);
+  const dineInTaxPercent = 5;
+  const taxAmount = Number(((cartSubtotal - discountAmount) * (dineInTaxPercent / 100)).toFixed(2));
+  const deliveryFee = 0;
+  const isDeliveryFree = true;
+  const freeDeliveryThreshold = 0;
+  const freeDeliveryRemaining = 0;
+  const minOrderValue = 0;
+  const cartTotal = Math.max(0, cartSubtotal - discountAmount + taxAmount);
 
-  // Place order & save to user orders
+  // Call waiter or request table service
+  const callWaiter = (requestType = 'Service') => {
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const bc = new BroadcastChannel('grillix_sync_channel');
+        bc.postMessage({ 
+          type: 'TABLE_CALL', 
+          tableNumber: currentTable || '1',
+          request: requestType,
+          time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+        });
+        bc.close();
+      }
+    } catch {}
+    playAdminAlertSound();
+    showToast(`🔔 Server alerted for Table #${currentTable || '1'} (${requestType})!`);
+  };
+
+  // Place order & send to restaurant kitchen
   const checkout = () => {
     if (cart.length === 0) {
-      showToast('Your bag is currently empty!');
-      return;
-    }
-    if (cartSubtotal < minOrderValue) {
-      showToast(`⚠️ Minimum cart value for delivery is ₹${minOrderValue}. Please add items!`);
+      showToast('Your table order is currently empty!');
       return;
     }
     const newId = Math.floor(1000000000000 + Math.random() * 9000000000000).toString();
@@ -603,18 +653,21 @@ export const AppProvider = ({ children }) => {
 
     const newPlacedOrder = {
       id: newId,
-      customerName: currentUser?.name || 'Kunal Pawar',
+      tableNumber: currentTable || '1',
+      orderType: 'Dine-In',
+      customerName: currentUser?.name || 'Guest Diner',
       customerPhone: currentUser?.phone || '+91 98201 44321',
-      address: currentUser?.addresses?.[0] || 'Flat 502, Green Meadows Residency, Spine Road, Moshi, Pune 412105',
+      address: `Dine-In Table #${currentTable || '1'} • GRILLIX Moshi, Pune`,
+      tableSection: 'Main Dining Hall',
       date: 'Just now',
       total: Number(cartTotal.toFixed(2)),
       subtotal: cartSubtotal,
-      deliveryFee: deliveryFee,
+      taxAmount: taxAmount,
+      deliveryFee: 0,
       status: 'Received',
       items: orderItemsSummary,
-      assignedRider: 'Vikram Singh',
-      paymentMethod: 'UPI (Google Pay)',
-      deliveryNotes: 'Leave at front door'
+      paymentMethod: 'Pay at Counter / UPI',
+      chefNotes: chefNotes || 'Dine-in order'
     };
 
     // Add to Admin orders pipeline
@@ -964,6 +1017,12 @@ export const AppProvider = ({ children }) => {
         setOrderStatus,
         currentOrderId,
         setCurrentOrderId,
+        currentTable,
+        setCurrentTable,
+        chefNotes,
+        setChefNotes,
+        callWaiter,
+        taxAmount,
         checkout,
         // Admin & Menu Management
         menuItems,

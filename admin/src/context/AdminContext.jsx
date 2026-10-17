@@ -10,83 +10,92 @@ import {
 } from '../utils/soundEffects';
 import { getApiBase } from '../utils/navigation';
 
-export const INITIAL_RIDERS = [
-  { id: 'rider-1', name: 'Vikram Singh', phone: '+91 98201 44321', vehicle: 'Ather 450X EV (Plate #MH-02-GR-402)', rating: 4.9, activeDeliveries: 1, tripsCompleted: 342, battery: 84, onDuty: true },
-  { id: 'rider-2', name: 'Aisha Khan', phone: '+91 98334 11980', vehicle: 'Honda Activa 6G (Plate #MH-02-GR-718)', rating: 4.8, activeDeliveries: 0, tripsCompleted: 219, battery: 92, onDuty: true },
-  { id: 'rider-3', name: 'Rohit Shinde', phone: '+91 98112 77654', vehicle: 'Eco Cargo E-Bike (Plate #MH-02-GR-109)', rating: 5.0, activeDeliveries: 0, tripsCompleted: 480, battery: 67, onDuty: true },
+export const INITIAL_TABLES = [
+  { id: 'T-01', number: '1', name: 'Table 1', section: 'Main Dining Hall', capacity: 2, status: 'Occupied', activeOrderId: 'GRX-DINE-101' },
+  { id: 'T-02', number: '2', name: 'Table 2', section: 'Main Dining Hall', capacity: 4, status: 'Occupied', activeOrderId: 'GRX-DINE-102' },
+  { id: 'T-03', number: '3', name: 'Table 3', section: 'Main Dining Hall', capacity: 4, status: 'Available', activeOrderId: null },
+  { id: 'T-04', number: '4', name: 'Table 4', section: 'Main Dining Hall', capacity: 6, status: 'Available', activeOrderId: null },
+  { id: 'T-05', number: '5', name: 'Table 5', section: 'Garden Patio', capacity: 4, status: 'Occupied', activeOrderId: 'GRX-DINE-103' },
+  { id: 'T-06', number: '6', name: 'Table 6', section: 'Garden Patio', capacity: 2, status: 'Available', activeOrderId: null },
+  { id: 'T-07', number: '7', name: 'VIP Cabin 1', section: 'Private VIP Lounge', capacity: 8, status: 'Reserved', activeOrderId: null },
+  { id: 'T-08', number: '8', name: 'Terrace Table 1', section: 'Rooftop Terrace', capacity: 4, status: 'Available', activeOrderId: null },
 ];
+
+export const INITIAL_RIDERS = [];
 
 export const INITIAL_ORDERS = [
   {
-    id: 'GRX-IND-101',
+    id: 'GRX-DINE-101',
+    tableNumber: '1',
+    orderType: 'Dine-In',
     customerName: 'Aarav Mehta',
     customerPhone: '+91 98331 22441',
-    address: 'Villa 12, Palm Meadows, Whitefield, Bengaluru 560066',
+    tableSection: 'Main Dining Hall',
     date: 'Today, 12:45 PM',
     total: 518.00,
-    status: 'Delivering',
+    status: 'Ready to Serve', // Received | Cooking in Kitchen | Ready to Serve | Served to Table | Completed
     items: ['Golden Sesame Crispy Tofu Bowl', 'Green Veggie Bowl'],
-    assignedRider: 'Vikram Singh',
     paymentMethod: 'UPI (Google Pay)',
-    deliveryNotes: 'Leave with security at main gate'
+    chefNotes: 'Serve dressing on the side, extra napkins'
   },
   {
-    id: 'GRX-IND-102',
+    id: 'GRX-DINE-102',
+    tableNumber: '2',
+    orderType: 'Dine-In',
     customerName: 'Ananya Deshmukh',
     customerPhone: '+91 98114 77890',
-    address: 'Flat 701, Riverdale Heights, Koregaon Park, Pune 411001',
+    tableSection: 'Main Dining Hall',
     date: 'Today, 12:50 PM',
     total: 319.00,
-    status: 'Preparing',
+    status: 'Cooking in Kitchen',
     items: ['Herb & Bean Patty Sandwich'],
-    assignedRider: 'Aisha Khan',
     paymentMethod: 'PhonePe UPI',
-    deliveryNotes: 'Call upon arrival'
+    chefNotes: 'Medium spicy, crisp the bread'
   },
   {
-    id: 'GRX-IND-103',
+    id: 'GRX-DINE-103',
+    tableNumber: '5',
+    orderType: 'Dine-In',
     customerName: 'Rohan Verma',
     customerPhone: '+91 98990 12345',
-    address: 'Tower B-402, DLF Phase 5, Golf Course Rd, Gurugram 122009',
+    tableSection: 'Garden Patio',
     date: 'Today, 12:55 PM',
     total: 279.00,
     status: 'Received',
     items: ['Avocado Citrus & Baby Fennel Salad'],
-    assignedRider: 'Unassigned',
     paymentMethod: 'Paytm Wallet',
-    deliveryNotes: 'Ring bell twice'
+    chefNotes: 'No onions please'
   },
   {
-    id: 'GRX-IND-100',
+    id: 'GRX-DINE-100',
+    tableNumber: '3',
+    orderType: 'Dine-In',
     customerName: 'Kunal Pawar',
     customerPhone: '+91 98200 11223',
-    address: 'Flat 502, Green Meadows Residency, Spine Road, Moshi, Pune 412105',
-    date: 'Yesterday, 8:15 PM',
+    tableSection: 'Main Dining Hall',
+    date: 'Today, 12:30 PM',
     total: 588.00,
-    status: 'Delivered',
+    status: 'Served to Table',
     items: ['Tofu Crunch High-Protein Bowl', 'Detox Cold-Pressed Green Juice'],
-    assignedRider: 'Rohit Shinde',
     paymentMethod: 'Credit Card (HDFC)',
-    deliveryNotes: 'Delivered at door'
+    chefNotes: 'Served and customer dining'
   }
 ];
 
 export const INITIAL_SETTINGS = {
-  name: 'GRILLIX Restaurant & Kitchen - Moshi Flagship',
-  tagline: 'Farm-Fresh Gourmet Bowls & Superfoods',
+  name: 'GRILLIX Restaurant & Central Kitchen - Moshi Flagship',
+  tagline: 'Farm-Fresh Gourmet Bowls & Superfoods • Dine-In & QR Ordering',
   phone: '+91 98200 44888',
   email: 'kitchen.moshi@grillix.in',
   address: 'Shop 12, Grand Spine Avenue, Pune-Nashik Highway, Moshi',
   city: 'Pune, Maharashtra 412105',
   openTime: '08:00 AM',
   closeTime: '11:30 PM',
-  prepTimeMinutes: 25,
-  deliveryRadiusKm: 8.5,
-  minOrderValue: 149,
-  deliveryFee: 39,
-  freeDeliveryThreshold: 499,
+  prepTimeMinutes: 20,
+  tableCount: 8,
+  dineInServiceEnabled: true,
   taxRatePercent: 5,
-  announcement: '🌿 Using 100% hydroponic organic greens and cold-pressed olive oils in Moshi, Pune!'
+  announcement: '🌿 Welcome to GRILLIX! Scan any table QR code to view our fresh digital menu and order directly to your table.'
 };
 
 export const INITIAL_COUPONS = [
@@ -152,16 +161,28 @@ export const AdminProvider = ({ children }) => {
     });
   });
 
-  // Riders Fleet State with LocalStorage
-  const [deliveryRiders, setDeliveryRiders] = useState(() => {
+  // Restaurant Tables State for Dine-In & QR Code ordering
+  const [tables, setTables] = useState(() => {
     try {
-      const saved = localStorage.getItem('grillix_admin_riders');
-      if (saved) return JSON.parse(saved);
+      const saved = localStorage.getItem('grillix_admin_tables');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
     } catch (e) {
-      console.warn('Could not read admin riders from storage', e);
+      console.warn('Could not read admin tables from storage', e);
     }
-    return INITIAL_RIDERS;
+    return INITIAL_TABLES;
   });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('grillix_admin_tables', JSON.stringify(tables));
+    } catch {}
+  }, [tables]);
+
+  // Riders Fleet State (Empty fallback for legacy references)
+  const [deliveryRiders, setDeliveryRiders] = useState(INITIAL_RIDERS);
 
   // Users State with LocalStorage
   const [allUsers, setAllUsers] = useState(() => {
@@ -480,9 +501,18 @@ export const AdminProvider = ({ children }) => {
       body: JSON.stringify({ id: orderId, status: newStatus })
     }).catch(() => {});
 
-    if (newStatus === 'Delivered') {
+    if (newStatus === 'Served to Table' || newStatus === 'Served' || newStatus === 'Delivered') {
       playDeliveredSound();
-      showToast(`🎉 Order #${orderId} marked as Delivered!`);
+      showToast(`🎉 Order #${orderId} served to table!`);
+    } else if (newStatus === 'Cooking in Kitchen' || newStatus === 'Preparing') {
+      playStatusUpdateSound();
+      showToast(`👨‍🍳 Order #${orderId} is now cooking in kitchen!`);
+    } else if (newStatus === 'Ready to Serve' || newStatus === 'Ready') {
+      playAdminAlertSound();
+      showToast(`🍽️ Order #${orderId} is plated & ready to serve!`);
+    } else if (newStatus === 'Completed') {
+      playDeliveredSound();
+      showToast(`💵 Order #${orderId} completed & billed.`);
     } else {
       playStatusUpdateSound();
       showToast(`Order #${orderId} advanced to "${newStatus}"`);
@@ -522,11 +552,47 @@ export const AdminProvider = ({ children }) => {
     showToast(`🗑️ Order #${orderId} removed from records.`);
   };
 
-  const assignRiderToOrder = (orderId, riderName) => {
-    setAllOrders((prev) =>
-      prev.map((ord) => (ord.id === orderId ? { ...ord, assignedRider: riderName } : ord))
-    );
-    showToast(`🛵 Assigned rider ${riderName} to order #${orderId}`);
+  const assignTableToOrder = (orderId, tableNumber) => {
+    setAllOrders((prev) => {
+      const next = prev.map((ord) => (ord.id === orderId ? { ...ord, tableNumber } : ord));
+      try { localStorage.setItem('grillix_admin_orders', JSON.stringify(next)); } catch {}
+      return next;
+    });
+    showToast(`🍽️ Assigned Table #${tableNumber} to order #${orderId}`);
+  };
+
+  const assignRiderToOrder = assignTableToOrder; // Backwards compatibility
+
+  // Table Management Actions
+  const addTable = (tableData) => {
+    const nextNum = tableData.number || String(tables.length + 1);
+    const newTable = {
+      id: `T-${String(nextNum).padStart(2, '0')}`,
+      number: String(nextNum),
+      name: tableData.name || `Table ${nextNum}`,
+      section: tableData.section || 'Main Dining Hall',
+      capacity: parseInt(tableData.capacity) || 4,
+      status: 'Available',
+      activeOrderId: null
+    };
+    setTables(prev => [...prev, newTable]);
+    showToast(`✅ Added Table #${newTable.number} (${newTable.section})`);
+    return newTable;
+  };
+
+  const updateTableStatus = (tableId, newStatus) => {
+    setTables(prev => prev.map(t => t.id === tableId ? { ...t, status: newStatus } : t));
+    showToast(`Table status updated to ${newStatus}`);
+  };
+
+  const updateTable = (tableId, updatedFields) => {
+    setTables(prev => prev.map(t => t.id === tableId ? { ...t, ...updatedFields } : t));
+    showToast(`Table details updated`);
+  };
+
+  const deleteTable = (tableId) => {
+    setTables(prev => prev.filter(t => t.id !== tableId));
+    showToast(`🗑️ Table removed`);
   };
 
   // 2. MENU & INVENTORY ACTIONS
@@ -698,6 +764,12 @@ export const AdminProvider = ({ children }) => {
         updateMenuItem,
         deleteMenuItem,
         addMenuItem,
+        tables,
+        addTable,
+        updateTableStatus,
+        updateTable,
+        deleteTable,
+        assignTableToOrder,
         deliveryRiders,
         addRider,
         updateRider,

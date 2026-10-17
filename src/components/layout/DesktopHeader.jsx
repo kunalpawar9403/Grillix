@@ -29,6 +29,7 @@ export const DesktopHeader = () => {
     searchQuery,
     setSearchQuery,
     currentUser,
+    currentTable,
     logout
   } = useApp();
 
@@ -221,6 +222,16 @@ export const DesktopHeader = () => {
               </button>
 
 
+
+              {/* Dine-In Table Badge */}
+              <button
+                onClick={() => navigateTo('cart')}
+                className="flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D8E2C6] border border-[#315B0B]/30 px-3 py-1 rounded-full text-xs font-black text-[#244507] transition-all shadow-2xs shrink-0"
+                title={`Dine-in active at Table #${currentTable}`}
+              >
+                <span className="w-2 h-2 rounded-full bg-[#315B0B] animate-pulse"></span>
+                <span>Table #{currentTable}</span>
+              </button>
 
               {/* Cart Bag Button */}
               <button

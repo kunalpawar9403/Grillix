@@ -43,10 +43,79 @@ import {
   BarChart3,
   Layers,
   Menu as MenuIcon,
-  LogOut
+  LogOut,
+  QrCode,
+  UtensilsCrossed,
+  Download,
+  Eye
 } from 'lucide-react';
+import QRCode from 'qrcode';
 import { useAdmin } from '../context/AdminContext';
 import { getStorefrontUrl } from '../utils/navigation';
+
+const TableQRCodeImage = ({ url, size = 160, className = '' }) => {
+  const [dataUrl, setDataUrl] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    QRCode.toDataURL(url, {
+      width: size * 2,
+      margin: 1,
+      color: {
+        dark: '#0a1408',
+        light: '#ffffff'
+      }
+    }).then(res => {
+      if (isMounted) setDataUrl(res);
+    }).catch(err => {
+      console.error('Failed to generate QR code', err);
+    });
+    return () => { isMounted = false; };
+  }, [url, size]);
+
+  if (!dataUrl) {
+    return (
+      <div 
+        style={{ width: size, height: size }} 
+        className={`bg-white/10 animate-pulse rounded-2xl flex items-center justify-center text-[10px] text-[#8fa778] ${className}`}
+      >
+        Generating QR...
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={dataUrl} 
+      alt="Table QR Code" 
+      style={{ width: size, height: size }}
+      className={`rounded-2xl bg-white p-2.5 shadow-md ${className}`} 
+    />
+  );
+};
+
+const downloadTableQr = (tableNumber, url) => {
+  QRCode.toDataURL(url, { width: 600, margin: 2, color: { dark: '#0a1408', light: '#ffffff' } })
+    .then(dataUri => {
+      const link = document.createElement('a');
+      link.download = `Grillix_Table_${tableNumber}_QR.png`;
+      link.href = dataUri;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    })
+    .catch(console.error);
+};
+
+const getTableQrUrl = (tableNumber) => {
+  if (typeof window !== 'undefined') {
+    if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '5175') {
+      return `http://localhost:5174/?table=${tableNumber}`;
+    }
+    return `${window.location.origin}/?table=${tableNumber}`;
+  }
+  return `/?table=${tableNumber}`;
+};
 
 export const AdminDashboard = () => {
   const { 
@@ -58,6 +127,12 @@ export const AdminDashboard = () => {
     cancelOrder,
     deleteOrder,
     assignRiderToOrder,
+    assignTableToOrder,
+    tables = [],
+    addTable,
+    updateTableStatus,
+    updateTable,
+    deleteTable,
     menuItems, 
     toggleMenuItemStock, 
     updateMenuItemPrice, 
@@ -95,7 +170,18 @@ export const AdminDashboard = () => {
   const [currentTime, setCurrentTime] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [selectedOutlet, setSelectedOutlet] = useState('Bandra West (Flagship)');
+  const [selectedOutlet, setSelectedOutlet] = useState('Moshi Flagship (PCMC Pune)');
+
+  // Table QR & Dine-In State
+  const [selectedTableForPrint, setSelectedTableForPrint] = useState(null);
+  const [showAddTableModal, setShowAddTableModal] = useState(false);
+  const [tableSectionFilter, setTableSectionFilter] = useState('all');
+  const [newTableForm, setNewTableForm] = useState({
+    number: '',
+    name: '',
+    section: 'Main Dining Hall',
+    capacity: 4
+  });
 
   // 1. EDIT DISH MODAL STATE
   const [showEditDishModal, setShowEditDishModal] = useState(false);
@@ -286,6 +372,27 @@ export const AdminDashboard = () => {
     updateRestaurantSettings(settingsForm);
   };
 
+  // Add Table
+  const handleAddTable = (e) => {
+    e.preventDefault();
+    if (!newTableForm.number.trim()) {
+      showToast('⚠️ Please enter a table number');
+      return;
+    }
+    const t = {
+      id: `table-${Date.now()}`,
+      number: newTableForm.number.trim(),
+      name: newTableForm.name.trim() || `Table ${newTableForm.number.trim()}`,
+      section: newTableForm.section || 'Main Dining Hall',
+      capacity: parseInt(newTableForm.capacity) || 4,
+      status: 'Available',
+      currentOrderId: null
+    };
+    addTable(t);
+    setShowAddTableModal(false);
+    setNewTableForm({ number: '', name: '', section: 'Main Dining Hall', capacity: 4 });
+  };
+
   // Add Rider
   const handleAddRider = (e) => {
     e.preventDefault();
@@ -432,7 +539,7 @@ export const AdminDashboard = () => {
     {
       heading: 'MANAGEMENT & CRM',
       items: [
-        { id: 'riders', label: 'Delivery Fleet', icon: Bike, count: deliveryRiders.length },
+        { id: 'tables', label: 'Tables & QR Codes', icon: QrCode, count: tables.length },
         { id: 'users', label: 'Customer CRM', icon: Users, count: allUsers.length },
         { id: 'coupons', label: 'Promo Coupons', icon: Ticket, count: coupons.length },
       ]
@@ -440,7 +547,7 @@ export const AdminDashboard = () => {
     {
       heading: 'SYSTEM & CONFIG',
       items: [
-        { id: 'settings', label: 'Delivery & Kitchen Control', icon: Store },
+        { id: 'settings', label: 'Restaurant & POS Setup', icon: Store },
         { id: 'analytics', label: 'Financial Reports', icon: TrendingUp },
       ]
     }
@@ -831,11 +938,11 @@ export const AdminDashboard = () => {
 
                 <div className="bg-[#12200d] border border-[#213c14] rounded-3xl p-4 space-y-1 shadow-sm hover:border-[#386022] transition-colors">
                   <div className="flex items-center justify-between text-[#8fa778]">
-                    <span className="text-[11px] font-bold uppercase tracking-wider">Active Riders</span>
-                    <Bike size={16} className="text-blue-400" />
+                    <span className="text-[11px] font-bold uppercase tracking-wider">Dining Tables</span>
+                    <QrCode size={16} className="text-[#a8e83c]" />
                   </div>
-                  <div className="text-xl sm:text-2xl font-black text-white">{deliveryRiders.length}</div>
-                  <div className="text-[10px] text-[#8fa778]">EV fleet on duty</div>
+                  <div className="text-xl sm:text-2xl font-black text-white">{tables.length}</div>
+                  <div className="text-[10px] text-emerald-400 font-bold">{tables.filter(t => t.status === 'Occupied').length} Seated • QR Active</div>
                 </div>
 
                 <div className="bg-[#12200d] border border-[#213c14] rounded-3xl p-4 space-y-1 shadow-sm hover:border-[#386022] transition-colors">
@@ -1006,31 +1113,41 @@ export const AdminDashboard = () => {
                     </div>
                   </div>
 
-                  {/* Rider Fleet Status Widget */}
+                  {/* Dining Tables Live Status Widget */}
                   <div className="bg-[#12200d] border border-[#213c14] rounded-3xl p-5 space-y-4 shadow-sm">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-extrabold text-white text-sm">Delivery Fleet Live</h3>
-                      <button onClick={() => setActiveTab('riders')} className="text-xs font-bold text-[#a8e83c]">
-                        Manage
+                      <h3 className="font-extrabold text-white text-sm flex items-center gap-2">
+                        <QrCode size={16} className="text-[#a8e83c]" />
+                        Dining Tables & Stands
+                      </h3>
+                      <button onClick={() => setActiveTab('tables')} className="text-xs font-bold text-[#a8e83c] hover:underline cursor-pointer">
+                        View All
                       </button>
                     </div>
 
                     <div className="space-y-2.5">
-                      {deliveryRiders.map(r => (
-                        <div key={r.id} className="p-3 bg-[#172911] rounded-2xl flex items-center justify-between">
+                      {tables.slice(0, 5).map(t => (
+                        <div key={t.id} className="p-3 bg-[#172911] rounded-2xl flex items-center justify-between">
                           <div className="flex items-center space-x-2.5">
-                            <div className="w-8 h-8 rounded-full bg-[#203a15] text-[#a8e83c] flex items-center justify-center font-bold text-xs">
-                              <Bike size={15} />
+                            <div className="w-8 h-8 rounded-full bg-[#203a15] text-[#a8e83c] flex items-center justify-center font-black text-xs">
+                              #{t.number}
                             </div>
                             <div>
-                              <span className="font-bold text-white text-xs block">{r.name}</span>
-                              <span className="text-[10px] text-[#8fa778]">{r.vehicle.split(' ')[0]} EV</span>
+                              <span className="font-bold text-white text-xs block">Table {t.number}</span>
+                              <span className="text-[10px] text-[#8fa778]">{t.section} • {t.capacity} Seats</span>
                             </div>
                           </div>
                           
                           <div className="text-right">
-                            <span className="text-xs font-bold text-emerald-400 block">{r.battery || 85}% Battery</span>
-                            <span className="text-[10px] text-[#8fa778]">{r.activeDeliveries || 0} active</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                              t.status === 'Occupied' 
+                                ? 'bg-amber-500/20 text-amber-300' 
+                                : t.status === 'Reserved'
+                                ? 'bg-indigo-500/20 text-indigo-300'
+                                : 'bg-emerald-500/20 text-emerald-300'
+                            }`}>
+                              {t.status}
+                            </span>
                           </div>
                         </div>
                       ))}
@@ -1071,7 +1188,7 @@ export const AdminDashboard = () => {
               <div className="bg-[#12200d] border border-[#213c14] rounded-3xl p-3 sm:p-4 flex flex-col md:flex-row items-center justify-between gap-3">
                 {/* Order Status Chips */}
                 <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar w-full md:w-auto">
-                  {['all', 'Received', 'Preparing', 'Ready', 'Delivering', 'Delivered', 'Cancelled'].map(status => (
+                  {['all', 'Received', 'Cooking in Kitchen', 'Ready to Serve', 'Served to Table', 'Completed', 'Cancelled'].map(status => (
                     <button
                       key={status}
                       onClick={() => setOrderFilter(status)}
@@ -1093,7 +1210,7 @@ export const AdminDashboard = () => {
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search order #, customer, phone..."
+                    placeholder="Search table #, customer, order ID..."
                     className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-full pl-10 pr-4 py-2 text-xs text-white placeholder-[#688053] focus:outline-none focus:border-[#a8e83c]"
                   />
                 </div>
@@ -1103,18 +1220,22 @@ export const AdminDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredOrders.length === 0 ? (
                   <div className="col-span-full py-16 text-center text-[#8fa778] bg-[#12200d] border border-[#213c14] rounded-3xl">
-                    <Package size={40} className="mx-auto text-[#3b5e23] mb-2" />
-                    <p className="font-bold">No orders found for this filter</p>
-                    <p className="text-xs text-[#688053] mt-1">Try switching tabs or searching another keyword</p>
+                    <UtensilsCrossed size={40} className="mx-auto text-[#3b5e23] mb-2" />
+                    <p className="font-bold">No active table tickets found</p>
+                    <p className="text-xs text-[#688053] mt-1">Orders scanned from table QR codes appear here in real-time</p>
                   </div>
                 ) : (
                   filteredOrders.map(order => {
                     const statusColors = {
                       Received: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+                      'Cooking in Kitchen': 'bg-blue-500/20 text-blue-300 border-blue-500/40',
                       Preparing: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
+                      'Ready to Serve': 'bg-purple-500/20 text-purple-300 border-purple-500/40',
                       Ready: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
-                      Delivering: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-                      Delivered: 'bg-stone-500/20 text-stone-300 border-stone-500/40',
+                      'Served to Table': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+                      Served: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+                      Delivered: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+                      Completed: 'bg-stone-500/20 text-stone-300 border-stone-500/40',
                       Cancelled: 'bg-red-500/20 text-red-300 border-red-500/40',
                     };
 
@@ -1124,15 +1245,20 @@ export const AdminDashboard = () => {
                         className="bg-[#12200d] border border-[#213c14] rounded-3xl p-5 space-y-4 hover:border-[#386022] transition-colors shadow-sm flex flex-col justify-between"
                       >
                         <div className="space-y-3">
-                          {/* Card Header */}
+                          {/* Card Header with Table Badge */}
                           <div className="flex items-center justify-between">
-                            <div>
-                              <span className="text-sm font-black text-white">#{order.id}</span>
-                              <span className="text-[11px] text-[#8fa778] block font-medium">{order.date}</span>
+                            <div className="flex items-center space-x-2">
+                              <span className="bg-[#a8e83c] text-[#091106] font-black px-2.5 py-1 rounded-xl text-xs tracking-tight shadow-xs">
+                                TABLE #{order.tableNumber || '1'}
+                              </span>
+                              <div>
+                                <span className="text-xs font-black text-white block">#{order.id.slice(-6)}</span>
+                                <span className="text-[10px] text-[#8fa778] block font-medium">{order.date}</span>
+                              </div>
                             </div>
                             
                             <div className="flex items-center space-x-1.5">
-                              <span className={`px-2.5 py-1 rounded-full text-[11px] font-black border ${statusColors[order.status] || 'bg-stone-800 text-stone-200'}`}>
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-black border ${statusColors[order.status] || 'bg-stone-800 text-stone-200'}`}>
                                 {order.status}
                               </span>
                               <button
@@ -1155,17 +1281,21 @@ export const AdminDashboard = () => {
                             </div>
                           </div>
 
-                          {/* Customer Info */}
-                          <div className="bg-[#172911] rounded-2xl p-3 space-y-1 text-xs">
+                          {/* Table & Guest Info */}
+                          <div className="bg-[#172911] rounded-2xl p-3 space-y-1.5 text-xs">
                             <div className="flex items-center justify-between font-bold text-white">
                               <span>{order.customerName}</span>
                               <span className="text-[#a8e83c] font-mono">{order.customerPhone}</span>
                             </div>
-                            <p className="text-[#8fa778] text-[11px] line-clamp-1">{order.address}</p>
-                            {order.deliveryNotes && (
-                              <p className="text-[10px] text-amber-300/80 italic font-mono pt-0.5">
-                                Note: {order.deliveryNotes}
-                              </p>
+                            <div className="flex items-center justify-between text-[#8fa778] text-[11px]">
+                              <span>Dining Zone:</span>
+                              <span className="font-bold text-white">{order.tableSection || 'Main Dining Hall'}</span>
+                            </div>
+                            {order.chefNotes && (
+                              <div className="pt-1 border-t border-[#233d15] text-[11px] text-amber-300 flex items-start space-x-1 font-medium italic">
+                                <Flame size={12} className="text-amber-400 shrink-0 mt-0.5" />
+                                <span>Chef Note: {order.chefNotes}</span>
+                              </div>
                             )}
                           </div>
 
@@ -1182,7 +1312,7 @@ export const AdminDashboard = () => {
                             </ul>
                           </div>
 
-                          {/* Payment & Rider Info */}
+                          {/* Payment & Table info */}
                           <div className="flex items-center justify-between text-xs pt-1 border-t border-[#1e3613]">
                             <div>
                               <span className="text-[10px] text-[#8fa778] block">Payment:</span>
@@ -1194,20 +1324,19 @@ export const AdminDashboard = () => {
                             </div>
                           </div>
 
-                          {/* Rider Assignment Dropdown */}
+                          {/* Table Assignment Selector */}
                           <div className="pt-1">
                             <label className="text-[10px] font-bold uppercase text-[#8fa778] block mb-1">
-                              Assigned Rider:
+                              Assigned Table:
                             </label>
                             <select
-                              value={order.assignedRider || 'Unassigned'}
-                              onChange={(e) => assignRiderToOrder(order.id, e.target.value)}
+                              value={order.tableNumber || '1'}
+                              onChange={(e) => assignTableToOrder(order.id, e.target.value)}
                               className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#a8e83c]"
                             >
-                              <option value="Unassigned">Unassigned Rider</option>
-                              {deliveryRiders.map(r => (
-                                <option key={r.id} value={r.name}>
-                                  {r.name} ({r.vehicle})
+                              {tables.map(t => (
+                                <option key={t.id} value={t.number}>
+                                  Table #{t.number} • {t.name} ({t.section})
                                 </option>
                               ))}
                             </select>
@@ -1216,43 +1345,43 @@ export const AdminDashboard = () => {
 
                         {/* Status Transition Action Buttons */}
                         <div className="pt-2 border-t border-[#1e3613] space-y-1.5">
-                          <span className="text-[10px] font-bold text-[#8fa778] block">Advance Kitchen Pipeline:</span>
+                          <span className="text-[10px] font-bold text-[#8fa778] block">Kitchen Pipeline Actions:</span>
                           <div className="grid grid-cols-2 gap-1.5">
                             {order.status === 'Received' && (
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'Preparing')}
-                                className="col-span-2 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors shadow-sm"
+                                onClick={() => updateOrderStatus(order.id, 'Cooking in Kitchen')}
+                                className="col-span-2 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors shadow-sm flex items-center justify-center space-x-1"
                               >
-                                👨‍🍳 Start Preparing
+                                <span>👨‍🍳 Start Cooking</span>
                               </button>
                             )}
-                            {order.status === 'Preparing' && (
+                            {(order.status === 'Cooking in Kitchen' || order.status === 'Preparing') && (
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'Ready')}
-                                className="col-span-2 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-colors shadow-sm"
+                                onClick={() => updateOrderStatus(order.id, 'Ready to Serve')}
+                                className="col-span-2 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-colors shadow-sm flex items-center justify-center space-x-1"
                               >
-                                🍱 Mark Food Ready
+                                <span>🍽️ Plated & Ready to Serve</span>
                               </button>
                             )}
-                            {order.status === 'Ready' && (
+                            {(order.status === 'Ready to Serve' || order.status === 'Ready') && (
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'Delivering')}
-                                className="col-span-2 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-sm"
+                                onClick={() => updateOrderStatus(order.id, 'Served to Table')}
+                                className="col-span-2 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors shadow-sm flex items-center justify-center space-x-1"
                               >
-                                🛵 Hand to Rider & Dispatch
+                                <span>✅ Served to Table #{order.tableNumber || '1'}</span>
                               </button>
                             )}
-                            {order.status === 'Delivering' && (
+                            {(order.status === 'Served to Table' || order.status === 'Delivered') && (
                               <button
-                                onClick={() => updateOrderStatus(order.id, 'Delivered')}
-                                className="col-span-2 py-2 rounded-xl bg-[#a8e83c] hover:bg-white text-[#091106] font-black text-xs transition-colors shadow-sm"
+                                onClick={() => updateOrderStatus(order.id, 'Completed')}
+                                className="col-span-2 py-2 rounded-xl bg-[#a8e83c] hover:bg-white text-[#091106] font-black text-xs transition-colors shadow-sm flex items-center justify-center space-x-1"
                               >
-                                ✅ Complete & Delivered
+                                <span>💵 Settle Bill & Free Table</span>
                               </button>
                             )}
-                            {order.status === 'Delivered' && (
+                            {order.status === 'Completed' && (
                               <div className="col-span-2 py-2 text-center text-xs font-bold text-stone-400 bg-[#172911] rounded-xl">
-                                Fulfilled Order ✓
+                                Completed & Table Cleared ✓
                               </div>
                             )}
                             {order.status === 'Cancelled' && (
@@ -1267,7 +1396,6 @@ export const AdminDashboard = () => {
                   })
                 )}
               </div>
-
             </div>
           )}
 
@@ -1651,94 +1779,217 @@ export const AdminDashboard = () => {
           )}
 
           {/* ---------------------------------------------------- */}
-          {/* TAB: RIDERS & FLEET */}
+          {/* TAB: DINING TABLES & QR CODES */}
           {/* ---------------------------------------------------- */}
-          {activeTab === 'riders' && (
-            <div className="space-y-4">
-              <div className="bg-[#12200d] border border-[#213c14] rounded-3xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          {activeTab === 'tables' && (
+            <div className="space-y-6">
+              {/* Header card with Action buttons */}
+              <div className="bg-[#12200d] border border-[#213c14] rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
                 <div>
-                  <h3 className="font-extrabold text-white text-base">Active Delivery Partners Fleet</h3>
-                  <p className="text-xs text-[#8fa778]">Manage EV delivery fleet, on-duty shifts, and vehicle plates</p>
-                </div>
-
-                <button
-                  onClick={() => setShowAddRiderModal(true)}
-                  className="flex items-center space-x-1.5 bg-[#a8e83c] hover:bg-[#bcf856] text-[#091106] px-4 py-2.5 rounded-full font-black text-xs transition-all shadow-md shrink-0 active:scale-95"
-                >
-                  <Plus size={16} />
-                  <span>Add Delivery Rider</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {deliveryRiders.map(rider => (
-                  <div key={rider.id} className="bg-[#12200d] border border-[#213c14] rounded-3xl p-5 space-y-4 flex flex-col justify-between">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-12 h-12 rounded-2xl bg-[#192c12] text-[#a8e83c] flex items-center justify-center font-bold">
-                            <Bike size={24} />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-white text-sm">{rider.name}</h4>
-                            <span className="text-[11px] text-[#8fa778] block">{rider.vehicle}</span>
-                          </div>
-                        </div>
-                        
-                        <button
-                          onClick={() => toggleRiderDuty(rider.id)}
-                          className={`text-[10px] px-2.5 py-0.5 rounded-full font-black ${
-                            rider.onDuty !== false
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                              : 'bg-stone-700 text-stone-300'
-                          }`}
-                        >
-                          {rider.onDuty !== false ? 'On Duty' : 'Off Shift'}
-                        </button>
-                      </div>
-
-                      <div className="bg-[#172911] rounded-2xl p-3 space-y-2 text-xs">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[#8fa778]">Phone:</span>
-                          <span className="font-mono text-white">{rider.phone}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[#8fa778]">Active Trips:</span>
-                          <span className="font-bold text-[#a8e83c]">{rider.activeDeliveries || 0}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[#8fa778]">EV Battery Level:</span>
-                          <span className="font-bold text-emerald-400">{rider.battery || 85}%</span>
-                        </div>
-                      </div>
+                  <div className="flex items-center space-x-3 mb-1">
+                    <div className="w-10 h-10 rounded-2xl bg-[#192c12] border border-[#2c4c1a] text-[#a8e83c] flex items-center justify-center">
+                      <QrCode size={22} />
                     </div>
-
-                    <div className="pt-2 flex items-center space-x-2 border-t border-[#1e3613]">
-                      <button
-                        onClick={() => {
-                          setEditingRider({ ...rider });
-                          setShowEditRiderModal(true);
-                        }}
-                        className="flex-1 py-2 rounded-xl bg-[#192c12] hover:bg-[#254219] text-white font-bold text-xs transition-colors flex items-center justify-center space-x-1"
-                      >
-                        <Edit2 size={12} />
-                        <span>Edit Rider</span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          if (window.confirm(`Delete rider ${rider.name} from fleet?`)) {
-                            deleteRider(rider.id);
-                          }
-                        }}
-                        className="p-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 text-red-400 transition-colors"
-                        title="Delete Rider"
-                      >
-                        <Trash2 size={13} />
-                      </button>
+                    <div>
+                      <h3 className="font-extrabold text-white text-lg flex items-center gap-2">
+                        Dining Tables & Menu QR Codes
+                        <span className="text-xs bg-[#a8e83c]/20 text-[#a8e83c] border border-[#a8e83c]/30 px-2.5 py-0.5 rounded-full font-bold">
+                          Dine-In System
+                        </span>
+                      </h3>
+                      <p className="text-xs text-[#8fa778]">
+                        Customers scan table QR with phone camera to instantly browse menu & place orders to kitchen
+                      </p>
                     </div>
                   </div>
+                </div>
+
+                <div className="flex items-center space-x-3 w-full md:w-auto">
+                  <button
+                    onClick={() => setShowAddTableModal(true)}
+                    className="flex-1 md:flex-initial flex items-center justify-center space-x-2 bg-[#a8e83c] hover:bg-[#bcf856] text-[#091106] px-5 py-3 rounded-2xl font-black text-xs transition-all shadow-lg active:scale-95"
+                  >
+                    <Plus size={16} />
+                    <span>Add New Dining Table</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick KPI stats bar */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-[#12200d] border border-[#213c14] rounded-2xl p-4 flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#192c12] text-[#a8e83c] flex items-center justify-center font-black text-base">
+                    {tables.length}
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-[#8fa778] font-bold">TOTAL TABLES</div>
+                    <div className="text-sm font-extrabold text-white">{tables.length} Active Stands</div>
+                  </div>
+                </div>
+
+                <div className="bg-[#12200d] border border-[#213c14] rounded-2xl p-4 flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-black text-base">
+                    {tables.filter(t => t.status === 'Occupied').length}
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-[#8fa778] font-bold">OCCUPIED / SEATED</div>
+                    <div className="text-sm font-extrabold text-amber-400">
+                      {tables.filter(t => t.status === 'Occupied').length} Tables Dining
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#12200d] border border-[#213c14] rounded-2xl p-4 flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-black text-base">
+                    {tables.filter(t => t.status === 'Available').length}
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-[#8fa778] font-bold">AVAILABLE NOW</div>
+                    <div className="text-sm font-extrabold text-emerald-400">
+                      {tables.filter(t => t.status === 'Available').length} Ready for Guests
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#12200d] border border-[#213c14] rounded-2xl p-4 flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-black text-base">
+                    {tables.filter(t => t.status === 'Reserved').length}
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-[#8fa778] font-bold">RESERVED</div>
+                    <div className="text-sm font-extrabold text-indigo-400">
+                      {tables.filter(t => t.status === 'Reserved').length} Bookings
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section Filter Pills */}
+              <div className="flex items-center space-x-2 overflow-x-auto pb-1 text-xs">
+                {['all', 'Main Dining Hall', 'Garden Patio', 'VIP Lounge', 'Rooftop Terrace'].map(sec => (
+                  <button
+                    key={sec}
+                    onClick={() => setTableSectionFilter(sec)}
+                    className={`px-4 py-2 rounded-xl font-bold whitespace-nowrap transition-all ${
+                      tableSectionFilter === sec
+                        ? 'bg-[#a8e83c] text-[#091106] shadow-md font-black'
+                        : 'bg-[#12200d] text-[#8fa778] hover:text-white border border-[#213c14]'
+                    }`}
+                  >
+                    {sec === 'all' ? 'All Sections' : sec}
+                  </button>
                 ))}
+              </div>
+
+              {/* Table Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                {tables
+                  .filter(t => tableSectionFilter === 'all' || t.section === tableSectionFilter)
+                  .map(table => {
+                    const qrUrl = getTableQrUrl(table.number);
+                    const statusColors = {
+                      Available: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+                      Occupied: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+                      Reserved: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+                      Cleaning: 'bg-stone-500/15 text-stone-300 border-stone-500/30'
+                    };
+
+                    return (
+                      <div 
+                        key={table.id}
+                        className="bg-[#12200d] border border-[#213c14] rounded-3xl p-5 flex flex-col justify-between hover:border-[#a8e83c]/40 transition-all shadow-lg group"
+                      >
+                        <div>
+                          {/* Table Top Header */}
+                          <div className="flex items-start justify-between gap-2 mb-3">
+                            <div>
+                              <div className="flex items-center space-x-2">
+                                <span className="text-xl font-black text-white">Table #{table.number}</span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#192c12] text-[#8fa778] border border-[#2c4c1a] font-bold">
+                                  👥 {table.capacity} Seats
+                                </span>
+                              </div>
+                              <div className="text-xs text-[#8fa778] font-medium mt-0.5">
+                                {table.section}
+                              </div>
+                            </div>
+
+                            {/* Status Selector Dropdown */}
+                            <select
+                              value={table.status}
+                              onChange={(e) => updateTableStatus(table.id, e.target.value)}
+                              className={`text-[11px] px-2.5 py-1 rounded-xl font-black border focus:outline-none cursor-pointer ${
+                                statusColors[table.status] || statusColors.Available
+                              }`}
+                            >
+                              <option value="Available" className="bg-[#12200d] text-emerald-300">● Available</option>
+                              <option value="Occupied" className="bg-[#12200d] text-amber-300">● Occupied</option>
+                              <option value="Reserved" className="bg-[#12200d] text-indigo-300">● Reserved</option>
+                              <option value="Cleaning" className="bg-[#12200d] text-stone-300">● Cleaning</option>
+                            </select>
+                          </div>
+
+                          {/* Center QR Display */}
+                          <div className="bg-[#0b1408] rounded-2xl p-4 my-3 flex flex-col items-center justify-center border border-[#1a3013]">
+                            <TableQRCodeImage url={qrUrl} size={150} />
+                            <div className="mt-3 text-center">
+                              <span className="text-[10px] text-[#8fa778] font-mono block truncate max-w-[200px]" title={qrUrl}>
+                                {qrUrl}
+                              </span>
+                              <span className="text-[11px] font-bold text-[#a8e83c] mt-0.5 block">
+                                Point camera to open Menu
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Card Footer Actions */}
+                        <div className="space-y-2 pt-2 border-t border-[#1a3013]">
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              onClick={() => setSelectedTableForPrint(table)}
+                              className="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-[#192c12] hover:bg-[#254219] text-[#a8e83c] font-black text-xs transition-colors cursor-pointer"
+                              title="Print Table Tent Stand"
+                            >
+                              <Printer size={13} />
+                              <span>Print Stand</span>
+                            </button>
+
+                            <button
+                              onClick={() => downloadTableQr(table.number, qrUrl)}
+                              className="flex items-center justify-center space-x-1.5 py-2.5 px-3 rounded-xl bg-[#192c12] hover:bg-[#254219] text-white font-bold text-xs transition-colors cursor-pointer"
+                              title="Download QR Image"
+                            >
+                              <Download size={13} />
+                              <span>PNG QR</span>
+                            </button>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => window.open(qrUrl, '_blank')}
+                              className="flex-1 flex items-center justify-center space-x-1 py-2 px-2.5 rounded-xl bg-[#15250f] hover:bg-[#1f3716] text-[#8fa778] hover:text-white text-xs font-semibold transition-colors cursor-pointer"
+                            >
+                              <ExternalLink size={12} />
+                              <span>Test Menu Link</span>
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                if (window.confirm(`Delete Table #${table.number}?`)) {
+                                  deleteTable(table.id);
+                                }
+                              }}
+                              className="p-2 rounded-xl bg-red-950/30 hover:bg-red-900/60 text-red-400 transition-colors cursor-pointer"
+                              title="Delete Table"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           )}
@@ -2252,17 +2503,20 @@ export const AdminDashboard = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="text-[#8fa778] block mb-1 font-bold">Delivery Address</label>
-                <input
-                  type="text"
-                  value={editingOrder.address}
-                  onChange={(e) => setEditingOrder({ ...editingOrder, address: e.target.value })}
-                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
-                />
-              </div>
-
               <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[#8fa778] block mb-1 font-bold">Assigned Table *</label>
+                  <select
+                    value={editingOrder.tableNumber || '1'}
+                    onChange={(e) => setEditingOrder({ ...editingOrder, tableNumber: e.target.value })}
+                    className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white font-bold focus:outline-none focus:border-[#a8e83c]"
+                  >
+                    {tables.map(t => (
+                      <option key={t.id} value={t.number}>Table #{t.number} ({t.section})</option>
+                    ))}
+                  </select>
+                </div>
+
                 <div>
                   <label className="text-[#8fa778] block mb-1 font-bold">Total Amount in ₹ INR</label>
                   <input
@@ -2273,27 +2527,15 @@ export const AdminDashboard = () => {
                     className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
                   />
                 </div>
-                <div>
-                  <label className="text-[#8fa778] block mb-1 font-bold">Assigned Rider</label>
-                  <select
-                    value={editingOrder.assignedRider || 'Unassigned'}
-                    onChange={(e) => setEditingOrder({ ...editingOrder, assignedRider: e.target.value })}
-                    className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
-                  >
-                    <option value="Unassigned">Unassigned</option>
-                    {deliveryRiders.map(r => (
-                      <option key={r.id} value={r.name}>{r.name}</option>
-                    ))}
-                  </select>
-                </div>
               </div>
 
               <div>
-                <label className="text-[#8fa778] block mb-1 font-bold">Special Delivery Notes</label>
+                <label className="text-[#8fa778] block mb-1 font-bold">Chef Special Cooking Instructions</label>
                 <input
                   type="text"
-                  value={editingOrder.deliveryNotes || ''}
-                  onChange={(e) => setEditingOrder({ ...editingOrder, deliveryNotes: e.target.value })}
+                  placeholder="e.g. Extra spicy, no onions, well-done roast"
+                  value={editingOrder.chefNotes || editingOrder.deliveryNotes || ''}
+                  onChange={(e) => setEditingOrder({ ...editingOrder, chefNotes: e.target.value, deliveryNotes: e.target.value })}
                   className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
                 />
               </div>
@@ -2350,37 +2592,40 @@ export const AdminDashboard = () => {
             </div>
 
             <div className="space-y-1 text-[11px]">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center bg-stone-100 p-2 rounded-xl border border-stone-300">
+                <span className="font-black text-sm uppercase text-stone-900">TABLE #{printOrder.tableNumber || '1'}</span>
+                <span className="text-[10px] bg-stone-900 text-white px-2 py-0.5 rounded-full font-bold">DINE-IN</span>
+              </div>
+              <div className="flex justify-between pt-1">
                 <span>Ticket #: <b>{printOrder.id}</b></span>
                 <span>{printOrder.date}</span>
               </div>
-              <div>Customer: <b>{printOrder.customerName}</b></div>
-              <div>Phone: {printOrder.customerPhone}</div>
-              <div>Address: {printOrder.address}</div>
-              {printOrder.deliveryNotes && (
-                <div className="bg-amber-50 p-1 rounded text-amber-900 mt-1">
-                  Note: {printOrder.deliveryNotes}
+              <div>Guest: <b>{printOrder.customerName}</b> ({printOrder.customerPhone})</div>
+              <div>Dining Zone: <b>{printOrder.tableSection || 'Main Dining Hall'}</b></div>
+              {(printOrder.chefNotes || printOrder.deliveryNotes) && (
+                <div className="bg-amber-100 p-1.5 rounded-lg text-amber-950 font-bold mt-1 text-[11px]">
+                  CHEF NOTE: {printOrder.chefNotes || printOrder.deliveryNotes}
                 </div>
               )}
             </div>
 
             <div className="border-t border-b border-dashed border-stone-400 py-2 space-y-1">
-              <span className="font-bold uppercase text-[10px] text-stone-500">DISPATCH ITEMS:</span>
+              <span className="font-bold uppercase text-[10px] text-stone-500">KITCHEN PREP ITEMS:</span>
               {printOrder.items.map((item, idx) => (
                 <div key={idx} className="flex justify-between font-bold text-xs">
                   <span>1x {item}</span>
-                  <span>[PREP]</span>
+                  <span className="text-emerald-700 font-mono">[COOK]</span>
                 </div>
               ))}
             </div>
 
             <div className="flex justify-between items-center text-xs font-bold pt-1">
-              <span>TOTAL (INC. TAXES):</span>
-              <span className="text-sm">₹{parseFloat(printOrder.total).toFixed(2)}</span>
+              <span>TABLE BILL TOTAL:</span>
+              <span className="text-sm font-black">₹{parseFloat(printOrder.total).toFixed(2)}</span>
             </div>
 
             <div className="pt-2 text-center text-[10px] text-stone-500 border-t border-stone-200">
-              Assigned Partner: {printOrder.assignedRider || 'Kitchen Counter'}
+              Kitchen Dispatch: Table #{printOrder.tableNumber || '1'} • Expeditor Desk
             </div>
 
             <div className="flex space-x-2 pt-2">
@@ -2406,164 +2651,200 @@ export const AdminDashboard = () => {
       )}
 
       {/* ==================================================== */}
-      {/* MODAL 5: ADD / EDIT RIDER */}
+      {/* MODAL: PRINTABLE TABLE TENT QR STAND */}
       {/* ==================================================== */}
-      {showAddRiderModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-[#12200d] border border-[#2c4c1a] rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl animate-scale">
-            <div className="flex items-center justify-between">
-              <h3 className="font-extrabold text-white text-base">Add New Delivery Rider</h3>
-              <button onClick={() => setShowAddRiderModal(false)} className="text-[#8fa778] hover:text-white">
-                <X size={20} />
+      {selectedTableForPrint && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-[#12200d] border border-[#2c4c1a] rounded-3xl p-6 w-full max-w-lg space-y-6 shadow-2xl animate-scale my-8">
+            <div className="flex items-center justify-between pb-3 border-b border-[#213c14]">
+              <div>
+                <h3 className="font-extrabold text-white text-lg">Table Tent QR Stand</h3>
+                <p className="text-xs text-[#8fa778]">Ready-to-print acrylic stand card for dining tables</p>
+              </div>
+              <button 
+                onClick={() => setSelectedTableForPrint(null)}
+                className="w-8 h-8 rounded-full bg-[#192c12] text-[#8fa778] hover:text-white flex items-center justify-center cursor-pointer"
+              >
+                <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleAddRider} className="space-y-3 text-xs">
-              <div>
-                <label className="text-[#8fa778] block mb-1 font-bold">Rider Full Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={newRiderForm.name}
-                  onChange={(e) => setNewRiderForm({ ...newRiderForm, name: e.target.value })}
-                  placeholder="e.g. Suraj Jadhav"
-                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
-                />
+            {/* Printable Preview Container */}
+            <div 
+              id="printable-table-tent" 
+              className="bg-[#091106] border-2 border-[#a8e83c] rounded-3xl p-8 text-center space-y-5 shadow-2xl relative overflow-hidden"
+            >
+              {/* Corner decor */}
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#a8e83c]/10 rounded-full blur-2xl pointer-events-none" />
+
+              {/* Restaurant Branding */}
+              <div className="space-y-1">
+                <div className="inline-flex items-center space-x-2 bg-[#12200d] border border-[#213c14] px-3.5 py-1 rounded-full text-xs text-[#a8e83c] font-black tracking-wider uppercase">
+                  <Flame size={13} className="text-[#a8e83c]" />
+                  <span>Grillix Smokehouse</span>
+                </div>
+                <h2 className="text-2xl font-black text-white tracking-tight">SCAN TO DINE & ORDER</h2>
+                <p className="text-xs text-[#8fa778]">Freshly grilled dishes served straight to your table</p>
               </div>
 
-              <div>
-                <label className="text-[#8fa778] block mb-1 font-bold">Phone Number *</label>
-                <input
-                  type="text"
-                  required
-                  value={newRiderForm.phone}
-                  onChange={(e) => setNewRiderForm({ ...newRiderForm, phone: e.target.value })}
-                  placeholder="+91 98200 12345"
-                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
-                />
+              {/* Table Number Spotlight */}
+              <div className="bg-[#12200d] border border-[#2c4c1a] rounded-2xl py-3 px-6 inline-block mx-auto shadow-inner">
+                <div className="text-xs font-bold text-[#8fa778] tracking-widest uppercase">YOUR TABLE</div>
+                <div className="text-4xl font-black text-[#a8e83c] tracking-tight">
+                  TABLE #{selectedTableForPrint.number}
+                </div>
+                <div className="text-xs text-stone-300 font-semibold mt-0.5">
+                  {selectedTableForPrint.section} • Capacity {selectedTableForPrint.capacity} Guests
+                </div>
               </div>
 
-              <div>
-                <label className="text-[#8fa778] block mb-1 font-bold">Vehicle Model & Plate</label>
-                <input
-                  type="text"
-                  value={newRiderForm.vehicle}
-                  onChange={(e) => setNewRiderForm({ ...newRiderForm, vehicle: e.target.value })}
-                  placeholder="Ather 450X EV (Plate #MH-02-GR-889)"
-                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
-                />
+              {/* Big High-Res QR Code */}
+              <div className="flex justify-center py-2">
+                <div className="bg-white p-4 rounded-3xl shadow-2xl border-4 border-[#a8e83c]">
+                  <TableQRCodeImage 
+                    url={getTableQrUrl(selectedTableForPrint.number)} 
+                    size={200} 
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="text-[#8fa778] block mb-1 font-bold">Initial Battery (%)</label>
-                <input
-                  type="number"
-                  value={newRiderForm.battery}
-                  onChange={(e) => setNewRiderForm({ ...newRiderForm, battery: e.target.value })}
-                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
-                />
+              {/* Instructions */}
+              <div className="bg-[#12200d]/80 rounded-2xl p-4 text-xs space-y-2 text-left border border-[#213c14]">
+                <div className="font-black text-white text-center text-xs uppercase tracking-wider mb-2">
+                  How to Order in 3 Easy Steps:
+                </div>
+                <div className="flex items-start space-x-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#a8e83c] text-[#091106] font-black text-[11px] flex items-center justify-center shrink-0">1</span>
+                  <span className="text-[#b5caa4]">Open your phone camera & aim at the QR code above.</span>
+                </div>
+                <div className="flex items-start space-x-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#a8e83c] text-[#091106] font-black text-[11px] flex items-center justify-center shrink-0">2</span>
+                  <span className="text-[#b5caa4]">Browse digital menu, customize cooking spice & add dishes.</span>
+                </div>
+                <div className="flex items-start space-x-2.5">
+                  <span className="w-5 h-5 rounded-full bg-[#a8e83c] text-[#091106] font-black text-[11px] flex items-center justify-center shrink-0">3</span>
+                  <span className="text-[#b5caa4]">Tap <strong>"Send Order to Kitchen"</strong>. Food is brought to your table!</span>
+                </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddRiderModal(false)}
-                  className="px-4 py-2 rounded-xl bg-[#192c12] text-[#8fa778] hover:text-white font-bold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#a8e83c] hover:bg-[#bcf856] text-[#091106] font-black"
-                >
-                  Save Rider
-                </button>
+              {/* Table Wi-Fi Info */}
+              <div className="pt-2 text-[11px] text-[#8fa778] flex items-center justify-center space-x-4">
+                <span>📶 <strong>Free Guest Wi-Fi:</strong> Grillix_Guest</span>
+                <span>🔑 <strong>Password:</strong> smokegrill</span>
               </div>
-            </form>
+            </div>
+
+            {/* Modal Action Buttons */}
+            <div className="flex items-center justify-end space-x-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setSelectedTableForPrint(null)}
+                className="px-5 py-2.5 rounded-xl bg-[#192c12] text-[#8fa778] hover:text-white font-bold text-xs cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadTableQr(selectedTableForPrint.number, getTableQrUrl(selectedTableForPrint.number))}
+                className="px-5 py-2.5 rounded-xl bg-[#1f3816] hover:bg-[#2b4c1f] text-white font-bold text-xs flex items-center space-x-1.5 cursor-pointer"
+              >
+                <Download size={14} />
+                <span>Download PNG</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-6 py-2.5 rounded-xl bg-[#a8e83c] hover:bg-[#bcf856] text-[#091106] font-black text-xs flex items-center space-x-1.5 shadow-lg cursor-pointer"
+              >
+                <Printer size={14} />
+                <span>Print Table Tent Stand</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {showEditRiderModal && editingRider && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
+      {/* ==================================================== */}
+      {/* MODAL: ADD NEW DINING TABLE */}
+      {/* ==================================================== */}
+      {showAddTableModal && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-[#12200d] border border-[#2c4c1a] rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl animate-scale">
             <div className="flex items-center justify-between">
-              <h3 className="font-extrabold text-white text-base">Edit Rider: {editingRider.name}</h3>
-              <button onClick={() => setShowEditRiderModal(false)} className="text-[#8fa778] hover:text-white">
+              <div>
+                <h3 className="font-extrabold text-white text-base">Add New Dining Table</h3>
+                <p className="text-xs text-[#8fa778]">Assign table number, dining section, and seating capacity</p>
+              </div>
+              <button onClick={() => setShowAddTableModal(false)} className="text-[#8fa778] hover:text-white cursor-pointer">
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveEditRider} className="space-y-3 text-xs">
+            <form onSubmit={handleAddTable} className="space-y-4 text-xs">
               <div>
-                <label className="text-[#8fa778] block mb-1 font-bold">Rider Full Name *</label>
+                <label className="text-[#8fa778] block mb-1 font-bold">Table Number *</label>
                 <input
                   type="text"
                   required
-                  value={editingRider.name}
-                  onChange={(e) => setEditingRider({ ...editingRider, name: e.target.value })}
-                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
+                  placeholder="e.g. 9 or VIP-2"
+                  value={newTableForm.number}
+                  onChange={(e) => setNewTableForm({ ...newTableForm, number: e.target.value })}
+                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3.5 py-2.5 text-white font-bold focus:outline-none focus:border-[#a8e83c]"
                 />
               </div>
 
               <div>
-                <label className="text-[#8fa778] block mb-1 font-bold">Phone Number *</label>
+                <label className="text-[#8fa778] block mb-1 font-bold">Table Label / Name (Optional)</label>
                 <input
                   type="text"
-                  required
-                  value={editingRider.phone}
-                  onChange={(e) => setEditingRider({ ...editingRider, phone: e.target.value })}
-                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
-                />
-              </div>
-
-              <div>
-                <label className="text-[#8fa778] block mb-1 font-bold">Vehicle Model & Plate</label>
-                <input
-                  type="text"
-                  value={editingRider.vehicle}
-                  onChange={(e) => setEditingRider({ ...editingRider, vehicle: e.target.value })}
-                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
+                  placeholder="e.g. Window Corner Booth"
+                  value={newTableForm.name}
+                  onChange={(e) => setNewTableForm({ ...newTableForm, name: e.target.value })}
+                  className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-[#a8e83c]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[#8fa778] block mb-1 font-bold">Battery (%)</label>
-                  <input
-                    type="number"
-                    value={editingRider.battery || 80}
-                    onChange={(e) => setEditingRider({ ...editingRider, battery: e.target.value })}
-                    className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
-                  />
+                  <label className="text-[#8fa778] block mb-1 font-bold">Dining Section</label>
+                  <select
+                    value={newTableForm.section}
+                    onChange={(e) => setNewTableForm({ ...newTableForm, section: e.target.value })}
+                    className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-[#a8e83c]"
+                  >
+                    <option value="Main Dining Hall">Main Dining Hall</option>
+                    <option value="Garden Patio">Garden Patio</option>
+                    <option value="VIP Lounge">VIP Lounge</option>
+                    <option value="Rooftop Terrace">Rooftop Terrace</option>
+                  </select>
                 </div>
 
                 <div>
-                  <label className="text-[#8fa778] block mb-1 font-bold">Shift Status</label>
-                  <select
-                    value={editingRider.onDuty ? 'true' : 'false'}
-                    onChange={(e) => setEditingRider({ ...editingRider, onDuty: e.target.value === 'true' })}
-                    className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2 text-white focus:outline-none focus:border-[#a8e83c]"
-                  >
-                    <option value="true">On Duty</option>
-                    <option value="false">Off Duty</option>
-                  </select>
+                  <label className="text-[#8fa778] block mb-1 font-bold">Seating Capacity (Guests)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={newTableForm.capacity}
+                    onChange={(e) => setNewTableForm({ ...newTableForm, capacity: parseInt(e.target.value) || 2 })}
+                    className="w-full bg-[#192c12] border border-[#2c4c1a] rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-[#a8e83c]"
+                  />
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-end space-x-2">
+              <div className="pt-3 flex items-center justify-end space-x-2 border-t border-[#1a3013]">
                 <button
                   type="button"
-                  onClick={() => setShowEditRiderModal(false)}
-                  className="px-4 py-2 rounded-xl bg-[#192c12] text-[#8fa778] hover:text-white font-bold"
+                  onClick={() => setShowAddTableModal(false)}
+                  className="px-4 py-2.5 rounded-xl bg-[#192c12] text-[#8fa778] hover:text-white font-bold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#a8e83c] hover:bg-[#bcf856] text-[#091106] font-black"
+                  className="px-5 py-2.5 rounded-xl bg-[#a8e83c] hover:bg-[#bcf856] text-[#091106] font-black shadow-lg cursor-pointer"
                 >
-                  Save Changes
+                  Create Table & QR
                 </button>
               </div>
             </form>
