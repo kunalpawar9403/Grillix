@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   ChevronLeft, 
-  ShoppingBag, 
   Sparkles, 
   Search, 
   ArrowRight, 
@@ -12,9 +11,9 @@ import {
   Soup,
   CupSoda,
   Wheat,
-  Plus,
   Bell,
-  UtensilsCrossed
+  UtensilsCrossed,
+  Info
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { FOOD_ITEMS } from '../data/mockData';
@@ -24,11 +23,8 @@ export const MenuScreen = () => {
     goBack, 
     navigateTo, 
     setSelectedProduct, 
-    addToCart, 
     searchQuery, 
     setSearchQuery, 
-    cartItemCount, 
-    cartTotal,
     menuItems = FOOD_ITEMS,
     currentTable,
     callWaiter
@@ -39,21 +35,14 @@ export const MenuScreen = () => {
 
   const categoryMeta = [
     { id: 'Featured', label: 'All Featured', icon: Sparkles },
-    { id: 'Protein Plates', label: 'Protein Plates', icon: Flame },
+    { id: 'Protein Plates', label: 'Live Fire Grills', icon: Flame },
     { id: 'Salads', label: 'Fresh Salads', icon: Salad },
-    { id: 'Warm Bowls', label: 'Warm Bowls', icon: Soup },
-    { id: 'Smoothies & Juices', label: 'Smoothies & Juices', icon: CupSoda },
+    { id: 'Warm Bowls', label: 'Artisan Bowls', icon: Soup },
+    { id: 'Smoothies & Juices', label: 'Craft Beverages', icon: CupSoda },
     { id: 'Sides & Bakery', label: 'Sides & Bakery', icon: Wheat },
   ];
 
   const diets = ['All', 'High Protein', 'Vegan', 'Gluten-Free', 'Organic'];
-
-  const getCategoryCount = (catId) => {
-    if (catId === 'Featured') return menuItems.length;
-    return menuItems.filter((item) => 
-      item.categories?.includes(catId) || item.category === catId
-    ).length;
-  };
 
   const filteredItems = menuItems.filter((item) => {
     const matchesCategory = activeCategory === 'Featured' 
@@ -74,11 +63,6 @@ export const MenuScreen = () => {
     navigateTo('product-detail', { product: item });
   };
 
-  const handleQuickAdd = (e, item) => {
-    e.stopPropagation();
-    addToCart(item, 1);
-  };
-
   return (
     <div className="w-full min-h-screen pb-28 md:pb-16 animate-fadeIn bg-[#EEF4E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-6">
@@ -86,70 +70,68 @@ export const MenuScreen = () => {
         {/* Top App Bar with Table & Dine-In Status */}
         <div className="flex items-center justify-between mb-4 gap-2">
           <button
-            onClick={goBack}
+            onClick={() => navigateTo('home')}
             className="w-10 h-10 rounded-full bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] flex items-center justify-center text-[#243019] transition-all active:scale-95 shadow-xs shrink-0 cursor-pointer"
-            aria-label="Back"
+            aria-label="Back to Restaurant"
+            title="Restaurant Home"
           >
             <ChevronLeft size={20} />
           </button>
 
           <div className="text-center min-w-0">
-            <span className="inline-flex items-center space-x-1.5 text-[10px] font-black uppercase tracking-wider bg-[#E3EBD3] border border-[#315B0B]/30 px-2.5 py-0.5 rounded-full text-[#244507] shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#315B0B] animate-pulse"></span>
-              <span>Table #{currentTable} • Dine-In</span>
+            <span className="inline-flex items-center space-x-1.5 text-[10px] font-black uppercase tracking-wider bg-[#E3EBD3] border border-[#315B0B]/30 px-3 py-1 rounded-full text-[#244507] shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#315B0B] animate-pulse"></span>
+              <span>Table #{currentTable || '1'} • Digital Menu</span>
             </span>
-            <h1 className="text-base sm:text-xl font-extrabold text-[#243019] tracking-tight truncate mt-0.5">
-              Digital Menu Card
+            <h1 className="text-base sm:text-2xl font-black text-[#243019] tracking-tight truncate mt-0.5">
+              Chef's Culinary Menu
             </h1>
           </div>
 
           <div className="flex items-center space-x-2 shrink-0">
             <button
               onClick={() => callWaiter('Assistance')}
-              className="w-10 h-10 rounded-full bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] text-[#244507] flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-full bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] text-[#244507] font-bold text-xs transition-all active:scale-95 shadow-xs cursor-pointer"
               title="Call server to your table"
               aria-label="Call Server"
             >
-              <Bell size={17} className="text-[#315B0B]" />
-            </button>
-
-            <button
-              onClick={() => navigateTo('cart')}
-              className="relative w-10 h-10 rounded-full bg-[#244507] text-[#A8E83C] hover:bg-[#315B0B] flex items-center justify-center transition-all active:scale-95 shadow-xs cursor-pointer"
-              aria-label="Shopping Bag Cart"
-              title={`View Table #${currentTable} Order`}
-            >
-              <ShoppingBag size={18} strokeWidth={2.2} />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-[#A8E83C] text-[#0F2002] font-black text-xs leading-none rounded-full flex items-center justify-center border-2 border-white shadow-md ring-1 ring-black/15 select-none animate-scale">
-                  {cartItemCount}
-                </span>
-              )}
+              <Bell size={15} className="text-[#315B0B]" />
+              <span className="hidden sm:inline">Call Server</span>
             </button>
           </div>
         </div>
 
-        {/* Custom Harvest Bowl Callout Banner */}
-        <div className="mb-5 bg-gradient-to-r from-[#244507] via-[#2D500B] to-[#1E3906] text-white rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border border-[#315B0B] shadow-sm">
-          <div className="flex items-center space-x-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-[#A8E83C] text-[#244507] flex items-center justify-center shrink-0 shadow-sm">
-              <ChefHat size={20} />
+        {/* Welcome Dine-In Banner when scanned from QR */}
+        <div className="mb-5 bg-gradient-to-r from-[#244507] via-[#2D500B] to-[#1E3906] text-white rounded-3xl p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-[#315B0B] shadow-md relative overflow-hidden">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#A8E83C] text-[#244507] flex items-center justify-center shrink-0 shadow-sm font-black text-lg">
+              #{currentTable || '1'}
             </div>
             <div>
-              <h2 className="text-sm sm:text-base font-extrabold text-white">
-                Want to build your own bowl?
+              <div className="flex items-center space-x-2">
+                <span className="text-[11px] font-black uppercase tracking-widest text-[#A8E83C]">
+                  GRILLIX SMOKEHOUSE & KITCHEN
+                </span>
+                <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-white/90">
+                  Dine-In
+                </span>
+              </div>
+              <h2 className="text-sm sm:text-lg font-black text-white mt-0.5">
+                Welcome to Table #{currentTable || '1'}
               </h2>
-              <p className="text-xs text-[#D0D8C2] mt-0.5 leading-relaxed">
-                Pick your warm grains, roasted vegetables, clean proteins & scratch seed-oil-free dressings.
+              <p className="text-xs text-[#D0D8C2] mt-0.5 leading-relaxed max-w-xl">
+                Browse our woodfire grilled specialties, hand-tossed bowls & craft beverages. Tap any dish to explore its farm-to-table ingredients.
               </p>
             </div>
           </div>
-          <button
-            onClick={() => navigateTo('custom-bowl')}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#A8E83C] hover:bg-white text-[#244507] font-extrabold text-xs whitespace-nowrap transition-all shadow-md active:scale-95 shrink-0 text-center"
-          >
-            Build Custom Bowl
-          </button>
+
+          <div className="flex items-center space-x-3 text-xs shrink-0 bg-black/25 px-4 py-2 rounded-2xl border border-white/10 self-start sm:self-auto">
+            <UtensilsCrossed size={16} className="text-[#A8E83C]" />
+            <div>
+              <div className="text-[10px] text-[#A8E83C] font-black">CHEF PREPARATION</div>
+              <div className="font-bold text-white text-[11px]">100% Scratch-Cooked Daily</div>
+            </div>
+          </div>
         </div>
 
         {/* Search & Results Bar */}
@@ -158,7 +140,7 @@ export const MenuScreen = () => {
             <Search size={16} className="text-[#747B68] mr-2.5 shrink-0" />
             <input
               type="text"
-              placeholder="Search chef's bowls, salads, smoothies, proteins..."
+              placeholder="Search dishes by name, vegetables, meats, spices..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-transparent text-xs sm:text-sm text-[#243019] placeholder-[#747B68] focus:outline-none font-medium"
@@ -173,70 +155,58 @@ export const MenuScreen = () => {
               </button>
             )}
           </div>
-          <span className="text-xs font-bold text-[#315B0B] bg-[#E3EBD3] px-3.5 py-2.5 rounded-2xl border border-[#D0D8C2] whitespace-nowrap shrink-0 shadow-xs">
-            {filteredItems.length} Dishes
-          </span>
         </div>
 
-        {/* Clean Iconic Category Filter Navigation (Responsive on both Desktop & Mobile) */}
-        <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar pb-2 mb-3 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth">
+        {/* Categories Carousel Filter Tabs */}
+        <div className="flex items-center space-x-2 overflow-x-auto pb-2 mb-3 no-scrollbar">
           {categoryMeta.map((cat) => {
-            const isActive = activeCategory === cat.id;
             const Icon = cat.icon;
-            const count = getCategoryCount(cat.id);
+            const isActive = activeCategory === cat.id;
             return (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold whitespace-nowrap transition-all duration-200 flex items-center space-x-2 shrink-0 ${
+                className={`flex items-center space-x-1.5 px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#244507] text-[#A8E83C] shadow-md ring-2 ring-[#A8E83C]/40'
-                    : 'bg-white text-[#243019] hover:bg-[#E3EBD3] border border-[#D0D8C2] shadow-2xs'
+                    ? 'bg-[#244507] text-[#A8E83C] shadow-sm'
+                    : 'bg-white text-[#243019] border border-[#D0D8C2] hover:bg-[#E3EBD3]'
                 }`}
               >
-                <Icon size={15} className={isActive ? 'text-[#A8E83C]' : 'text-[#315B0B]'} />
+                <Icon size={14} className={isActive ? 'text-[#A8E83C]' : 'text-[#315B0B]'} />
                 <span>{cat.label}</span>
-                <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${
-                  isActive ? 'bg-[#A8E83C] text-[#0F2002]' : 'bg-[#EEF4E3] text-[#747B68]'
-                }`}>
-                  {count}
-                </span>
               </button>
             );
           })}
         </div>
 
-        {/* Secondary Dietary Filter Tags */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pb-3 mb-6 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <span className="text-[11px] font-bold text-[#747B68] pr-1.5 shrink-0">Dietary:</span>
-          {diets.map((diet) => {
-            const active = activeDiet === diet;
-            return (
-              <button
-                key={diet}
-                onClick={() => setActiveDiet(diet)}
-                className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all shrink-0 ${
-                  active
-                    ? 'bg-[#315B0B] text-white shadow-xs'
-                    : 'bg-white text-[#747B68] hover:text-[#243019] border border-[#D0D8C2]'
-                }`}
-              >
-                {diet}
-              </button>
-            );
-          })}
+        {/* Dietary Filter Pills */}
+        <div className="flex items-center space-x-1.5 overflow-x-auto pb-3 mb-5 no-scrollbar text-xs">
+          <span className="text-[11px] font-bold text-[#747B68] mr-1 hidden sm:inline">Dietary:</span>
+          {diets.map((diet) => (
+            <button
+              key={diet}
+              onClick={() => setActiveDiet(diet)}
+              className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer ${
+                activeDiet === diet
+                  ? 'bg-[#315B0B] text-white shadow-2xs'
+                  : 'bg-[#E3EBD3] text-[#4F5945] hover:bg-[#D5E1C3]'
+              }`}
+            >
+              {diet}
+            </button>
+          ))}
         </div>
 
-        {/* Clean 2-Column Mobile Grid & 3-Column Desktop Grid matching flowchart Screen 2 */}
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+        {/* Pure Showcase Dishes Grid (No Prices, No Add to Cart) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredItems.map((item) => (
             <div
               key={item.id}
               onClick={() => handleCardClick(item)}
-              className="group bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-[#D0D8C2] shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1"
+              className="group bg-white rounded-3xl overflow-hidden border border-[#D0D8C2] shadow-xs hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between hover:-translate-y-1"
             >
-              {/* Top Photography with Overlay Badges & Quick Add */}
-              <div className="relative aspect-square sm:aspect-[4/3] w-full overflow-hidden bg-[#EEF4E3]">
+              {/* Top Photography with Overlay Badges */}
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#EEF4E3]">
                 <img
                   src={item.image}
                   alt={item.name}
@@ -246,85 +216,53 @@ export const MenuScreen = () => {
                   }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
 
-                {/* Top Badge or Sold Out Badge */}
-                <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-                  {item.isOutOfStock ? (
-                    <span className="bg-rose-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-md uppercase tracking-wider inline-block">
-                      Sold Out
-                    </span>
-                  ) : (
-                    <span className="bg-[#244507]/85 backdrop-blur-md text-[#A8E83C] text-[9px] sm:text-[10px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-white/15 shadow-sm truncate max-w-[95px] sm:max-w-none inline-block">
-                      {item.badge || item.category}
-                    </span>
-                  )}
+                {/* Top Badge */}
+                <div className="absolute top-3 left-3">
+                  <span className="bg-[#244507]/90 backdrop-blur-md text-[#A8E83C] text-[10px] font-black px-2.5 py-1 rounded-full border border-white/15 shadow-sm inline-block">
+                    {item.badge || item.category}
+                  </span>
                 </div>
 
-                {/* Floating Quick Add Circle Button */}
-                <button
-                  disabled={item.isOutOfStock}
-                  onClick={(e) => handleQuickAdd(e, item)}
-                  className={`absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 rounded-full backdrop-blur-md border border-white/80 flex items-center justify-center transition-all shadow-md ${
-                    item.isOutOfStock
-                      ? 'bg-stone-300 text-stone-500 cursor-not-allowed'
-                      : 'bg-white/95 hover:bg-[#A8E83C] text-[#244507] active:scale-90 group-hover:scale-105'
-                  }`}
-                  title={item.isOutOfStock ? "Item Sold Out" : `Quick Add ${item.name}`}
-                  aria-label={`Quick Add ${item.name}`}
-                >
-                  <Plus size={15} strokeWidth={2.8} />
-                </button>
-
-                {/* Bottom Overlay Price & Calories */}
-                <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 flex items-center justify-between text-white">
-                  <span className="text-sm sm:text-lg font-black text-[#A8E83C] drop-shadow-md">
-                    ₹{item.menuPrice.toFixed(0)}
+                {/* Calories Indicator */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
+                  <span className="text-[10px] font-bold text-white/95 bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                    🔥 {item.calories} Calories
                   </span>
-                  <span className="text-[9px] sm:text-[11px] font-bold text-white/95 bg-black/45 backdrop-blur-md px-1.5 sm:px-2.5 py-0.5 rounded-full border border-white/10">
-                    {item.calories} CALS
-                  </span>
+                  {item.nutrition?.protein && (
+                    <span className="text-[10px] font-bold text-[#A8E83C] bg-black/50 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
+                      {item.nutrition.protein}
+                    </span>
+                  )}
                 </div>
               </div>
 
               {/* Card Body Details */}
-              <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between">
+              <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3">
                 <div>
-                  <h3 className="text-xs sm:text-lg font-extrabold text-[#243019] group-hover:text-[#315B0B] transition-colors leading-snug line-clamp-1">
+                  <h3 className="text-base sm:text-lg font-black text-[#243019] group-hover:text-[#315B0B] transition-colors leading-snug">
                     {item.name}
                   </h3>
-                  <p className="hidden sm:block text-xs text-[#747B68] mt-1.5 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#747B68] mt-1.5 line-clamp-2 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
 
-                {/* Nutrition Pills & Quick Add Label */}
-                <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-3 border-t border-[#EEF4E3] flex items-center justify-between gap-1">
-                  <div className="flex items-center space-x-1 flex-wrap gap-y-1">
-                    {item.nutrition && (
-                      <span className="text-[9px] sm:text-[10px] font-extrabold text-[#315B0B] bg-[#EEF4E3] px-1.5 sm:px-2 py-0.5 rounded-md border border-[#D0D8C2]/60">
-                        {item.nutrition.protein}
+                {/* Dietary Tags & Explore Link */}
+                <div className="pt-3 border-t border-[#EEF4E3] flex items-center justify-between">
+                  <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
+                    {item.dietary?.slice(0, 2).map((d, idx) => (
+                      <span key={idx} className="text-[10px] font-bold text-[#315B0B] bg-[#EEF4E3] px-2 py-0.5 rounded-md">
+                        {d}
                       </span>
-                    )}
-                    {item.dietary?.[0] && (
-                      <span className="text-[9px] sm:text-[10px] font-bold text-[#747B68] bg-[#F5F8EF] px-1.5 sm:px-2 py-0.5 rounded-md truncate max-w-[65px] sm:max-w-none">
-                        {item.dietary[0]}
-                      </span>
-                    )}
+                    ))}
                   </div>
 
-                  <button
-                    disabled={item.isOutOfStock}
-                    onClick={(e) => handleQuickAdd(e, item)}
-                    className={`text-[11px] sm:text-xs font-black flex items-center space-x-0.5 shrink-0 ${
-                      item.isOutOfStock
-                        ? 'text-rose-500 cursor-not-allowed'
-                        : 'text-[#315B0B] hover:text-[#244507]'
-                    }`}
-                  >
-                    <span>{item.isOutOfStock ? 'Sold Out' : 'Add'}</span>
-                    {!item.isOutOfStock && <ShoppingBag size={12} />}
-                  </button>
+                  <span className="text-xs font-black text-[#315B0B] group-hover:text-[#244507] flex items-center space-x-1 shrink-0">
+                    <span>Recipe Info</span>
+                    <ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
+                  </span>
                 </div>
               </div>
             </div>
@@ -334,7 +272,7 @@ export const MenuScreen = () => {
         {filteredItems.length === 0 && (
           <div className="text-center py-16 bg-[#E3EBD3] rounded-3xl border border-[#D0D8C2] mt-4">
             <Sparkles size={36} className="text-[#315B0B] mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-[#243019]">No dishes match your selection</h3>
+            <h3 className="text-lg font-bold text-[#243019]">No culinary dishes match your selection</h3>
             <p className="text-xs text-[#747B68] mt-1">Try resetting the category filter or search term</p>
             <button
               onClick={() => {
@@ -342,30 +280,9 @@ export const MenuScreen = () => {
                 setActiveDiet('All');
                 setSearchQuery('');
               }}
-              className="mt-4 px-5 py-2 rounded-full bg-[#315B0B] text-white text-xs font-bold"
+              className="mt-4 px-5 py-2 rounded-full bg-[#315B0B] text-white text-xs font-bold cursor-pointer"
             >
               Reset Filters
-            </button>
-          </div>
-        )}
-
-        {/* Floating Quick Bag Checkout Bar on Mobile */}
-        {cartItemCount > 0 && (
-          <div className="fixed bottom-20 left-4 right-4 z-30 max-w-md mx-auto animate-fadeIn">
-            <button
-              onClick={() => navigateTo('cart')}
-              className="w-full bg-[#244507] hover:bg-[#315B0B] text-white py-3.5 px-5 rounded-2xl shadow-2xl flex items-center justify-between border border-[#A8E83C]/50 active:scale-[0.98] transition-all"
-            >
-              <div className="flex items-center space-x-2.5">
-                <div className="w-7 h-7 rounded-full bg-[#A8E83C] text-[#244507] font-black text-xs flex items-center justify-center">
-                  {cartItemCount}
-                </div>
-                <span className="text-xs sm:text-sm font-extrabold tracking-wide">View Bag</span>
-              </div>
-              <div className="flex items-center space-x-2 font-bold text-xs sm:text-sm text-[#A8E83C]">
-                <span>${cartTotal.toFixed(2)}</span>
-                <ArrowRight size={16} />
-              </div>
             </button>
           </div>
         )}

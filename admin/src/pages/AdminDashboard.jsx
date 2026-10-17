@@ -162,8 +162,9 @@ export const AdminDashboard = () => {
     toastMessage
   } = useAdmin();
 
-  // Navigation tab: 'overview' | 'orders' | 'menu' | 'settings' | 'riders' | 'users' | 'coupons' | 'analytics'
-  const [activeTab, setActiveTab] = useState('overview');
+  // Navigation tab: 'tables' (QR Generator) | 'menu' | 'settings'
+  const [activeTab, setActiveTab] = useState('tables');
+  const [sampleTableNumber, setSampleTableNumber] = useState('1');
   const [orderFilter, setOrderFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -526,29 +527,19 @@ export const AdminDashboard = () => {
     setEditingCoupon(null);
   };
 
-  // Sidebar Menu Configuration
+  // Sidebar Menu Configuration - Focused on Table QR Code Generator & Restaurant Showcase
   const navSections = [
     {
-      heading: 'CORE OPERATIONS',
+      heading: 'TABLE QR CODES',
       items: [
-        { id: 'overview', label: 'Command Center', icon: LayoutDashboard },
-        { id: 'orders', label: 'Live Orders', icon: ShoppingBag, count: allOrders.length },
-        { id: 'menu', label: 'Menu & Dishes', icon: Edit2, count: menuItems.length },
+        { id: 'tables', label: 'QR Generator & Stands', icon: QrCode, count: tables.length },
       ]
     },
     {
-      heading: 'MANAGEMENT & CRM',
+      heading: 'RESTAURANT SHOWCASE',
       items: [
-        { id: 'tables', label: 'Tables & QR Codes', icon: QrCode, count: tables.length },
-        { id: 'users', label: 'Customer CRM', icon: Users, count: allUsers.length },
-        { id: 'coupons', label: 'Promo Coupons', icon: Ticket, count: coupons.length },
-      ]
-    },
-    {
-      heading: 'SYSTEM & CONFIG',
-      items: [
-        { id: 'settings', label: 'Restaurant & POS Setup', icon: Store },
-        { id: 'analytics', label: 'Financial Reports', icon: TrendingUp },
+        { id: 'menu', label: 'Menu Dishes & Photos', icon: Edit2, count: menuItems.length },
+        { id: 'settings', label: 'Restaurant & Wi-Fi Info', icon: Store },
       ]
     }
   ];
@@ -737,18 +728,15 @@ export const AdminDashboard = () => {
                 <span>Grillix</span>
                 <span>/</span>
                 <span className="text-[#a8e83c] font-bold capitalize">
-                  {activeTab === 'overview' ? 'Dashboard Overview' : activeTab}
+                  {activeTab === 'tables' ? 'QR Code Generator' : activeTab}
                 </span>
               </div>
               <h1 className="text-base sm:text-lg font-black text-white capitalize leading-tight">
+                {activeTab === 'tables' && 'Table QR Code Generator & Stand Designer'}
+                {activeTab === 'menu' && 'Showcase Menu Dishes & Photos'}
+                {activeTab === 'settings' && 'Restaurant Profile & Wi-Fi Setup'}
                 {activeTab === 'overview' && 'Operations Command Center'}
                 {activeTab === 'orders' && 'Live Kitchen Orders & Dispatch'}
-                {activeTab === 'menu' && 'Menu & Inventory Management'}
-                {activeTab === 'settings' && 'Restaurant & Outlet Profile'}
-                {activeTab === 'riders' && 'Delivery Fleet Logistics'}
-                {activeTab === 'users' && 'Customer CRM & Loyalty'}
-                {activeTab === 'coupons' && 'Promotions & Discounts'}
-                {activeTab === 'analytics' && 'Financial Sales Analytics'}
               </h1>
             </div>
           </div>
@@ -1794,11 +1782,11 @@ export const AdminDashboard = () => {
                       <h3 className="font-extrabold text-white text-lg flex items-center gap-2">
                         Dining Tables & Menu QR Codes
                         <span className="text-xs bg-[#a8e83c]/20 text-[#a8e83c] border border-[#a8e83c]/30 px-2.5 py-0.5 rounded-full font-bold">
-                          Dine-In System
+                          Pure Showcase Mode
                         </span>
                       </h3>
                       <p className="text-xs text-[#8fa778]">
-                        Customers scan table QR with phone camera to instantly browse menu & place orders to kitchen
+                        Guests scan table QR codes with their phone camera to view the restaurant menu & culinary story
                       </p>
                     </div>
                   </div>
@@ -1812,6 +1800,126 @@ export const AdminDashboard = () => {
                     <Plus size={16} />
                     <span>Add New Dining Table</span>
                   </button>
+                </div>
+              </div>
+
+              {/* INTERACTIVE SAMPLE QR CODE GENERATOR & TESTER */}
+              <div className="bg-gradient-to-br from-[#15270f] via-[#101e0c] to-[#091106] border-2 border-[#a8e83c]/50 rounded-3xl p-6 sm:p-7 shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#a8e83c]/10 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
+                  <div className="space-y-4 max-w-xl text-left">
+                    <div className="inline-flex items-center space-x-2 bg-[#213d15] text-[#a8e83c] px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border border-[#a8e83c]/30">
+                      <Sparkles size={14} />
+                      <span>Instant Menu QR Tester</span>
+                    </div>
+
+                    <div>
+                      <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                        Generate & Test Sample Table QR Code
+                      </h2>
+                      <p className="text-xs sm:text-sm text-[#8fa778] mt-1">
+                        Type any table number to create a live QR code. Scan with your phone or click below to verify how the pure restaurant showcase menu looks!
+                      </p>
+                    </div>
+
+                    {/* Table Input and Quick Presets */}
+                    <div className="space-y-2 pt-1">
+                      <label className="text-xs font-bold text-[#b5caa4] uppercase tracking-wide block">
+                        Table Number or VIP Name:
+                      </label>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="text"
+                          value={sampleTableNumber}
+                          onChange={(e) => setSampleTableNumber(e.target.value || '1')}
+                          placeholder="e.g. 1, 2, 5, VIP-1"
+                          className="bg-[#0b1408] border-2 border-[#a8e83c] focus:outline-none rounded-2xl px-4 py-2.5 text-white font-mono text-base font-black w-36 text-center shadow-inner"
+                        />
+                        <div className="flex items-center space-x-1.5">
+                          {['1', '2', '3', '5', 'VIP-1'].map((num) => (
+                            <button
+                              key={num}
+                              type="button"
+                              onClick={() => setSampleTableNumber(num)}
+                              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                                sampleTableNumber === num
+                                  ? 'bg-[#a8e83c] text-[#091106] font-black shadow-md'
+                                  : 'bg-[#192c12] text-[#8fa778] hover:text-white border border-[#2c4c1a]'
+                              }`}
+                            >
+                              Table {num}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Resolved URL Display */}
+                    <div className="bg-[#0b1408] border border-[#1e3412] rounded-2xl p-3 flex items-center justify-between gap-2 text-xs">
+                      <div className="truncate font-mono text-[#8fa778]">
+                        <span className="text-white font-bold">Menu Target URL: </span>
+                        <span className="text-[#a8e83c]">{getTableQrUrl(sampleTableNumber)}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard?.writeText(getTableQrUrl(sampleTableNumber));
+                          showToast('📋 Copied QR URL to clipboard!');
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-[#192c12] hover:bg-[#254219] text-[#a8e83c] text-[11px] font-bold shrink-0 cursor-pointer"
+                      >
+                        Copy Link
+                      </button>
+                    </div>
+
+                    {/* Action Buttons for Sample */}
+                    <div className="flex flex-wrap items-center gap-3 pt-2">
+                      <button
+                        onClick={() => window.open(getTableQrUrl(sampleTableNumber), '_blank')}
+                        className="flex items-center space-x-2 bg-[#a8e83c] hover:bg-[#bcf856] text-[#091106] px-5 py-3 rounded-2xl font-black text-xs transition-all shadow-lg cursor-pointer active:scale-95"
+                      >
+                        <ExternalLink size={15} />
+                        <span>Open & Test Menu in Browser</span>
+                      </button>
+
+                      <button
+                        onClick={() => downloadTableQr(sampleTableNumber, getTableQrUrl(sampleTableNumber))}
+                        className="flex items-center space-x-2 bg-[#192c12] hover:bg-[#254219] text-white px-4 py-3 rounded-2xl font-bold text-xs transition-all border border-[#2c4c1a] cursor-pointer"
+                      >
+                        <Download size={15} />
+                        <span>Download PNG QR</span>
+                      </button>
+
+                      <button
+                        onClick={() => setSelectedTableForPrint({
+                          number: sampleTableNumber,
+                          section: 'Sample Testing Stand',
+                          capacity: 4
+                        })}
+                        className="flex items-center space-x-2 bg-[#192c12] hover:bg-[#254219] text-[#a8e83c] px-4 py-3 rounded-2xl font-bold text-xs transition-all border border-[#2c4c1a] cursor-pointer"
+                      >
+                        <Printer size={15} />
+                        <span>Print Table Stand Tent</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* QR Preview Box with Phone Frame Accent */}
+                  <div className="bg-[#0b1408] border-2 border-[#244709] rounded-3xl p-5 flex flex-col items-center justify-center shadow-2xl shrink-0 text-center">
+                    <div className="text-[10px] font-mono text-[#8fa778] uppercase tracking-wider mb-2">
+                      LIVE SCAN PREVIEW • TABLE #{sampleTableNumber}
+                    </div>
+                    <div className="p-3 bg-white rounded-2xl shadow-xl">
+                      <TableQRCodeImage url={getTableQrUrl(sampleTableNumber)} size={180} />
+                    </div>
+                    <div className="mt-3 flex items-center space-x-1.5 text-xs font-black text-[#a8e83c]">
+                      <Sparkles size={13} />
+                      <span>Scan with Phone Camera</span>
+                    </div>
+                    <span className="text-[10px] text-[#8fa778] mt-0.5">
+                      Opens pure showcase digital menu
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -2711,19 +2819,19 @@ export const AdminDashboard = () => {
               {/* Instructions */}
               <div className="bg-[#12200d]/80 rounded-2xl p-4 text-xs space-y-2 text-left border border-[#213c14]">
                 <div className="font-black text-white text-center text-xs uppercase tracking-wider mb-2">
-                  How to Order in 3 Easy Steps:
+                  Experience Our Restaurant:
                 </div>
                 <div className="flex items-start space-x-2.5">
                   <span className="w-5 h-5 rounded-full bg-[#a8e83c] text-[#091106] font-black text-[11px] flex items-center justify-center shrink-0">1</span>
-                  <span className="text-[#b5caa4]">Open your phone camera & aim at the QR code above.</span>
+                  <span className="text-[#b5caa4]">Open your smartphone camera & scan the QR code above.</span>
                 </div>
                 <div className="flex items-start space-x-2.5">
                   <span className="w-5 h-5 rounded-full bg-[#a8e83c] text-[#091106] font-black text-[11px] flex items-center justify-center shrink-0">2</span>
-                  <span className="text-[#b5caa4]">Browse digital menu, customize cooking spice & add dishes.</span>
+                  <span className="text-[#b5caa4]">Explore our complete culinary menu, woodfired grills & chef story.</span>
                 </div>
                 <div className="flex items-start space-x-2.5">
                   <span className="w-5 h-5 rounded-full bg-[#a8e83c] text-[#091106] font-black text-[11px] flex items-center justify-center shrink-0">3</span>
-                  <span className="text-[#b5caa4]">Tap <strong>"Send Order to Kitchen"</strong>. Food is brought to your table!</span>
+                  <span className="text-[#b5caa4]">Enjoy your dine-in experience or press <strong>"Call Server"</strong> for assistance.</span>
                 </div>
               </div>
 

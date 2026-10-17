@@ -106,16 +106,16 @@ export const DiscoveryScreen = () => {
                     <span>Operating Hours</span>
                   </div>
                   <p className="font-bold text-[#243019]">{currentRest.hours}</p>
-                  <span className="text-[10px] text-emerald-700 font-semibold">● Open Now for Delivery</span>
+                  <span className="text-[10px] text-emerald-700 font-semibold">● Open for Dine-In & Walk-ins</span>
                 </div>
 
                 <div className="bg-[#EEF4E3] p-3 rounded-2xl border border-[#D0D8C2]/60 space-y-1">
                   <div className="flex items-center space-x-1.5 text-[#315B0B] font-extrabold">
-                    <Bike size={14} />
-                    <span>Delivery Speed</span>
+                    <Sparkles size={14} />
+                    <span>Table Service</span>
                   </div>
-                  <p className="font-bold text-[#243019]">20 - 30 Mins Avg</p>
-                  <span className="text-[10px] text-[#747B68] font-semibold">Zero-emission EV Fleet</span>
+                  <p className="font-bold text-[#243019]">4 Dining Sections</p>
+                  <span className="text-[10px] text-[#747B68] font-semibold">Indoor, Patio & VIP Lounge</span>
                 </div>
               </div>
 
@@ -135,7 +135,7 @@ export const DiscoveryScreen = () => {
                     <span>{currentRest.phone}</span>
                   </div>
                   <span className="text-[11px] text-[#315B0B] font-extrabold bg-[#EEF4E3] px-2.5 py-1 rounded-full border border-[#D0D8C2]/60">
-                    FSSAI 5-Star Clean
+                    Fine Dining & Grills
                   </span>
                 </div>
               </div>
@@ -160,18 +160,13 @@ export const DiscoveryScreen = () => {
             </div>
 
             {/* Bottom Actions */}
-            <div className="pt-4 border-t border-[#D0D8C2] grid grid-cols-2 gap-3">
+            <div className="pt-4 border-t border-[#D0D8C2]">
               <button
                 onClick={() => navigateTo('menu')}
-                className="w-full bg-[#244507] hover:bg-[#315B0B] text-white py-3 rounded-2xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 text-center"
+                className="w-full bg-[#244507] hover:bg-[#315B0B] text-white py-3.5 rounded-2xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 text-center flex items-center justify-center space-x-2 cursor-pointer"
               >
-                Order for Delivery
-              </button>
-              <button
-                onClick={() => navigateTo('custom-bowl')}
-                className="w-full bg-[#E3EBD3] hover:bg-[#D5E1C3] text-[#244507] border border-[#D0D8C2] py-3 rounded-2xl font-black text-xs sm:text-sm transition-all active:scale-95 text-center"
-              >
-                Build Custom Bowl
+                <span>Explore Culinary Menu</span>
+                <ArrowRight size={15} />
               </button>
             </div>
 

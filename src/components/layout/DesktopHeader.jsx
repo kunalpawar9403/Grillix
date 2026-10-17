@@ -63,19 +63,14 @@ export const DesktopHeader = () => {
   }, []);
 
   const primaryNavLinks = [
-    { id: 'menu', label: 'Menu', screen: 'menu' },
-    { id: 'custom-bowl', label: 'Build Bowl', screen: 'custom-bowl', isSpecial: true },
-    { id: 'discovery', label: 'Our Restaurant', screen: 'discovery' },
-    { id: 'rewards', label: 'Rewards', screen: 'rewards' },
+    { id: 'menu', label: 'Culinary Menu', screen: 'menu' },
+    { id: 'discovery', label: 'Our Restaurant & Story', screen: 'discovery' },
+    { id: 'home', label: 'Dine-In Showcase', screen: 'home' }
   ];
 
-  const secondaryNavLinks = [
-    { id: 'gift-cards', label: 'Gift Cards', screen: 'gift-cards' },
-    { id: 'how-it-works', label: 'How It Works', screen: 'how-it-works' },
-    { id: 'order-tracking', label: 'Track Order', screen: 'order-tracking' },
-  ];
+  const secondaryNavLinks = [];
 
-  const allNavLinks = [...primaryNavLinks, ...secondaryNavLinks];
+  const allNavLinks = [...primaryNavLinks];
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -210,63 +205,38 @@ export const DesktopHeader = () => {
             )}
           </form>
 
-          {/* Dedicated Restaurant Dine-In Controls (No Profile Needed) */}
+          {/* Pure Restaurant Showcase Controls */}
           <div className="flex items-center space-x-2 shrink-0">
-            {/* Dine-In Active Table Badge */}
+            {/* Table Badge */}
             <button
-              onClick={() => navigateTo('cart')}
+              onClick={() => navigateTo('menu')}
               className="flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D8E2C6] border border-[#315B0B]/30 px-3.5 py-1.5 rounded-full text-xs font-black text-[#244507] transition-all shadow-xs shrink-0 cursor-pointer"
-              title={`Dine-in active at Table #${currentTable} - Tap to view order`}
+              title={`Table #${currentTable || '1'} Active • View Digital Menu`}
             >
               <span className="w-2.5 h-2.5 rounded-full bg-[#315B0B] animate-pulse"></span>
-              <span className="tracking-tight uppercase">Table #{currentTable}</span>
+              <span className="tracking-tight uppercase">Table #{currentTable || '1'}</span>
             </button>
 
             {/* Quick Call Server Button */}
             <button
               onClick={() => callWaiter('Assistance')}
-              className="hidden sm:flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] px-3 py-1.5 rounded-full text-xs font-bold text-[#244507] transition-all shrink-0 active:scale-95 cursor-pointer shadow-xs"
+              className="hidden sm:flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] px-3.5 py-1.5 rounded-full text-xs font-bold text-[#244507] transition-all shrink-0 active:scale-95 cursor-pointer shadow-xs"
               title="Call waiter/server to your table"
             >
               <Bell size={13} className="text-[#315B0B]" />
               <span>Call Server</span>
             </button>
 
-            {/* Kitchen Orders Tracker Link */}
-            <button
-              onClick={() => navigateTo('order-tracking')}
-              className="hidden md:flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] px-3 py-1.5 rounded-full text-xs font-bold text-[#244507] transition-all shrink-0 active:scale-95 cursor-pointer shadow-xs"
-              title="Track live kitchen preparation progress"
-            >
-              <Clock size={13} className="text-[#315B0B]" />
-              <span>Kitchen Status</span>
-            </button>
-
-            {/* Cart Bag Button (Send to Kitchen) */}
-            <button
-              onClick={() => navigateTo('cart')}
-              className="relative w-9 h-9 rounded-full bg-[#244507] text-[#A8E83C] hover:bg-[#315B0B] transition-colors focus:outline-none shadow-sm active:scale-95 flex items-center justify-center shrink-0 cursor-pointer"
-              aria-label="View Kitchen Order"
-              title="View Table Order / Cart"
-            >
-              <ShoppingBag size={16} />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 bg-[#A8E83C] text-[#0F2002] font-black text-xs leading-none rounded-full flex items-center justify-center border-2 border-white shadow-md ring-1 ring-black/15 select-none animate-scale">
-                  {cartItemCount}
-                </span>
-              )}
-            </button>
-
-            {/* Kitchen Admin Portal Link */}
+            {/* Admin QR Portal Link */}
             <a
               href={getAdminUrl()}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden xl:flex items-center space-x-1.5 bg-[#244507]/10 hover:bg-[#244507]/20 border border-[#315B0B]/20 px-3 py-1.5 rounded-full text-[11px] font-bold text-[#315B0B] transition-colors"
-              title="Open Kitchen Management & KDS"
+              className="flex items-center space-x-1.5 bg-[#244507]/10 hover:bg-[#244507]/20 border border-[#315B0B]/20 px-3 py-1.5 rounded-full text-[11px] font-bold text-[#315B0B] transition-colors"
+              title="Admin Panel: Generate & Print Table QR Codes"
             >
               <Shield size={12} />
-              <span>Kitchen Display</span>
+              <span>Admin QR Portal</span>
               <ExternalLink size={10} className="text-[#747B68]" />
             </a>
           </div>

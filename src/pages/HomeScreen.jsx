@@ -340,20 +340,10 @@ export const HomeScreen = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
-                  {/* Quick Add Button */}
-                  <button
-                    onClick={(e) => handleAddQuick(e, item)}
-                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/40 hover:bg-[#A8E83C] hover:text-[#244507] backdrop-blur-md border border-white/60 flex items-center justify-center text-white transition-all shadow-sm active:scale-90"
-                    aria-label={`Add ${item.name} to bag`}
-                    title="Quick Add to Bag"
-                  >
-                    <Plus size={16} strokeWidth={2.6} />
-                  </button>
-
                   {/* Category or Tag Badge */}
                   <div className="absolute top-3 left-3">
-                    <span className="bg-[#244507]/75 backdrop-blur-sm text-[#A8E83C] text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/10">
-                      ₹{item.menuPrice.toFixed(0)}
+                    <span className="bg-[#244507]/80 backdrop-blur-sm text-[#A8E83C] text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/10">
+                      {item.category || "Chef's Special"}
                     </span>
                   </div>
 
@@ -362,8 +352,8 @@ export const HomeScreen = () => {
                     <p className="text-xs font-semibold leading-tight line-clamp-2 drop-shadow-sm group-hover:text-[#A8E83C] transition-colors">
                       {item.tagline || item.name}
                     </p>
-                    <span className="text-[10px] text-white/70 block mt-0.5">
-                      {item.calories} CALS • {item.deliveryTime}
+                    <span className="text-[10px] text-white/80 block mt-0.5">
+                      🔥 {item.calories} CALS • Fresh Farm Ingredients
                     </span>
                   </div>
                 </div>
@@ -375,32 +365,32 @@ export const HomeScreen = () => {
 
       {/* Featured Restaurant Discovery Teaser */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 sm:mt-14">
-        <div className="bg-[#E3EBD3] rounded-3xl p-6 sm:p-8 border border-[#D0D8C2] flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="bg-[#E3EBD3] rounded-3xl p-6 sm:p-8 border border-[#D0D8C2] flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="space-y-2 text-center md:text-left">
             <div className="inline-flex items-center space-x-1.5 bg-[#315B0B] text-[#A8E83C] text-xs font-bold px-3 py-1 rounded-full">
               <Clock size={13} />
-              <span>Kitchens Open Now</span>
+              <span>Dine-In Kitchen Open</span>
             </div>
             <h3 className="text-xl sm:text-2xl font-extrabold text-[#243019]">
-              Nearest Kitchen: Park Meadows
+              Grillix Flagship Restaurant & Smokehouse
             </h3>
             <p className="text-sm text-[#747B68] max-w-lg">
-              8423 Park Meadows Center Drive #E160 Lone Tree, CO • Pickup ready in 15-20 mins
+              Spine Rd, Moshi, Pimpri-Chinchwad, Pune • 4 Seating Sections (Indoor, Patio & VIP Lounge)
             </p>
           </div>
 
           <div className="flex items-center space-x-3 w-full sm:w-auto">
             <button
               onClick={() => navigateTo('discovery')}
-              className="flex-1 sm:flex-none px-6 py-3.5 rounded-full bg-[#315B0B] hover:bg-[#244507] text-white font-bold text-sm shadow-md transition-all active:scale-95 text-center"
+              className="flex-1 sm:flex-none px-6 py-3.5 rounded-full bg-[#315B0B] hover:bg-[#244507] text-white font-bold text-sm shadow-md transition-all active:scale-95 text-center cursor-pointer"
             >
-              View Map & Locations
+              View Restaurant Story & Map
             </button>
             <button
               onClick={() => navigateTo('menu')}
-              className="flex-1 sm:flex-none px-6 py-3.5 rounded-full bg-white hover:bg-[#F5F8EF] text-[#244507] font-bold text-sm border border-[#D0D8C2] transition-all text-center"
+              className="flex-1 sm:flex-none px-6 py-3.5 rounded-full bg-white hover:bg-[#F5F8EF] text-[#244507] font-bold text-sm border border-[#D0D8C2] transition-all text-center cursor-pointer"
             >
-              Order Online
+              Explore Digital Menu
             </button>
           </div>
         </div>
