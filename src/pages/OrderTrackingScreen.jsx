@@ -25,6 +25,7 @@ import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import { LiveDeliveryMap } from '../components/map/LiveDeliveryMap';
 import { playStatusUpdateSound } from '../utils/soundEffects';
+import { getAdminUrl } from '../utils/navigation';
 
 export const OrderTrackingScreen = () => {
   const { 
@@ -159,11 +160,11 @@ export const OrderTrackingScreen = () => {
           </div>
 
           <a
-            href="http://localhost:5175"
+            href={getAdminUrl()}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center space-x-1.5 bg-[#244507] hover:bg-[#315B0B] text-[#A8E83C] px-3 py-1.5 rounded-full font-bold text-xs shadow-xs transition-all active:scale-95"
-            title="Open Kitchen Admin Console on Port 5175"
+            title="Open Kitchen Admin Console"
           >
             <span>Kitchen View</span>
             <ExternalLink size={12} />
@@ -377,11 +378,11 @@ export const OrderTrackingScreen = () => {
             </button>
 
             <a
-              href="http://localhost:5175"
+              href={getAdminUrl()}
               target="_blank"
               rel="noopener noreferrer"
               className="py-3 px-5 rounded-full bg-[#E3EBD3] hover:bg-[#D5E1C3] text-[#244507] font-bold text-xs transition-all border border-[#D0D8C2] flex items-center justify-center space-x-1"
-              title="Open Kitchen Admin on Port 5175"
+              title="Open Kitchen Admin"
             >
               <span>Kitchen Portal ↗</span>
             </a>

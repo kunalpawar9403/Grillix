@@ -42,6 +42,13 @@ function sharedApiPlugin() {
 
         const url = req.url ? req.url.split('?')[0] : '';
 
+        // Dev redirect for /admin to separate admin port 5175
+        if (url === '/admin' || url === '/admin/') {
+          res.writeHead(302, { Location: 'http://localhost:5175' });
+          res.end();
+          return;
+        }
+
         // 1. GET /api/orders
         if (url === '/api/orders' && req.method === 'GET') {
           const store = getStore();

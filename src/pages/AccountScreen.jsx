@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { RESTAURANTS } from '../data/mockData';
+import { getAdminUrl } from '../utils/navigation';
 
 export const AccountScreen = () => {
   const { 
@@ -360,11 +361,11 @@ export const AccountScreen = () => {
                 <p className="text-xs text-stone-200">Manage incoming orders, toggle live inventory, and view delivery fleet.</p>
               </div>
               <a
-                href="http://localhost:5175"
+                href={getAdminUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-2.5 rounded-full bg-[#A8E83C] hover:bg-white text-[#244507] font-black text-xs shrink-0 shadow-xs transition-all active:scale-95 flex items-center space-x-1"
-                title="Launch Kitchen Admin Console on Port 5175"
+                title="Launch Kitchen Admin Console"
               >
                 <span>Open Admin Portal ↗</span>
               </a>
@@ -455,13 +456,13 @@ export const AccountScreen = () => {
                 <ChevronRight size={18} className="text-[#747B68]" />
               </button>
 
-              {/* Kitchen Partner Admin Console Link (Opens in New Tab on Port 5175) */}
+              {/* Kitchen Partner Admin Console Link */}
               <a
-                href="http://localhost:5175"
+                href={getAdminUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full p-3.5 flex items-center justify-between hover:bg-[#EEF4E3] rounded-2xl transition-colors text-left group bg-[#F5F8EF] border border-[#D0D8C2]"
-                title="Open Kitchen Partner Admin on Port 5175"
+                title="Open Kitchen Partner Admin Console"
               >
                 <div className="flex items-center space-x-3">
                   <div className="w-9 h-9 rounded-xl bg-[#244507] text-[#A8E83C] flex items-center justify-center shadow-xs">
@@ -471,11 +472,11 @@ export const AccountScreen = () => {
                     <span className="text-xs sm:text-sm font-bold text-[#243019] flex items-center space-x-1.5">
                       <span>Kitchen Partner Admin Portal</span>
                       <span className="text-[10px] bg-[#244507] text-[#A8E83C] px-2 py-0.5 rounded-full font-black">
-                        Port 5175
+                        Admin
                       </span>
                     </span>
-                    <span className="text-[11px] text-[#747B68] font-mono block">
-                      http://localhost:5175 (Opens in new tab)
+                    <span className="text-[11px] text-[#747B68] block">
+                      Live kitchen management & orders pipeline
                     </span>
                   </div>
                 </div>

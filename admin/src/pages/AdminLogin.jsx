@@ -13,6 +13,7 @@ import {
   KeyRound
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
+import { getStorefrontUrl } from '../utils/navigation';
 
 export const AdminLogin = () => {
   const { adminLogin, restaurantSettings, showToast } = useAdmin();
@@ -71,13 +72,13 @@ export const AdminLogin = () => {
         </div>
 
         <a
-          href="http://localhost:5174"
+          href={getStorefrontUrl()}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-[#12210b] hover:bg-[#1c3511] text-[#a8e83c] text-xs font-bold transition-colors border border-[#213e13]"
-          title="Open Customer Storefront on Port 5174"
+          title="Open Customer Storefront"
         >
-          <span>Storefront (Port 5174)</span>
+          <span>Customer Storefront</span>
           <ExternalLink size={12} />
         </a>
       </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { Heart, ShieldCheck, Sparkles, Sprout, ArrowRight, ExternalLink } from 'lucide-react';
+import { getAdminUrl } from '../../utils/navigation';
 
 export const DesktopFooter = () => {
   const { navigateTo, setUserPoints, showToast } = useApp();
@@ -54,13 +55,13 @@ export const DesktopFooter = () => {
               <li><button onClick={() => navigateTo('gift-cards')} className="hover:text-white transition-colors">Send a Gift Card</button></li>
               <li className="pt-1 border-t border-[#315B0B]">
                 <a 
-                  href="http://localhost:5175" 
+                  href={getAdminUrl()} 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="hover:text-white transition-colors flex items-center space-x-1 font-bold text-[#A8E83C]"
-                  title="Open Admin Portal in New Tab (http://localhost:5175)"
+                  title="Open Kitchen Admin Console"
                 >
-                  <span>Kitchen Partner (localhost:5175)</span>
+                  <span>Kitchen Partner Portal</span>
                   <ExternalLink size={12} className="inline ml-1" />
                 </a>
               </li>

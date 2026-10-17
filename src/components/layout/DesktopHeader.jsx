@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { RESTAURANTS } from '../../data/mockData';
+import { getAdminUrl } from '../../utils/navigation';
 
 export const DesktopHeader = () => {
   const { 
@@ -303,16 +304,16 @@ export const DesktopHeader = () => {
                     </button>
 
                     <a
-                      href="http://localhost:5175"
+                      href={getAdminUrl()}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setUserMenuOpen(false)}
                       className="w-full px-4 py-2.5 text-left text-xs font-bold text-[#243019] hover:bg-[#EEF4E3] flex items-center justify-between transition-colors"
-                      title="Open Kitchen Partner Portal on Port 5175"
+                      title="Open Kitchen Partner Console"
                     >
                       <div className="flex items-center space-x-2.5">
                         <Shield size={15} className="text-[#315B0B]" />
-                        <span>Partner Console (Port 5175)</span>
+                        <span>Partner Console</span>
                       </div>
                       <ExternalLink size={12} className="text-[#747B68]" />
                     </a>

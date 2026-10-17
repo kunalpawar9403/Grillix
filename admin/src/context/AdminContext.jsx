@@ -8,6 +8,7 @@ import {
   playDeliveredSound, 
   playAdminAlertSound 
 } from '../utils/soundEffects';
+import { getApiBase } from '../utils/navigation';
 
 export const INITIAL_RIDERS = [
   { id: 'rider-1', name: 'Vikram Singh', phone: '+91 98201 44321', vehicle: 'Ather 450X EV (Plate #MH-02-GR-402)', rating: 4.9, activeDeliveries: 1, tripsCompleted: 342, battery: 84, onDuty: true },
@@ -301,9 +302,9 @@ export const AdminProvider = ({ children }) => {
     const syncFromFrontend = async () => {
       try {
         const [ordersRes, statusRes, settingsRes] = await Promise.allSettled([
-          fetch('http://localhost:5174/api/orders'),
-          fetch('http://localhost:5174/api/kitchen-status'),
-          fetch('http://localhost:5174/api/restaurant-settings')
+          fetch(`${getApiBase()}/api/orders`),
+          fetch(`${getApiBase()}/api/kitchen-status`),
+          fetch(`${getApiBase()}/api/restaurant-settings`)
         ]);
 
         if (ordersRes.status === 'fulfilled' && ordersRes.value.ok) {
@@ -354,7 +355,7 @@ export const AdminProvider = ({ children }) => {
   const toggleKitchenStatus = () => {
     setKitchenStatus((prev) => {
       const next = prev === 'Online' ? 'Paused' : 'Online';
-      fetch('http://localhost:5174/api/kitchen-status', {
+      fetch(`${getApiBase()}/api/kitchen-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: next })
@@ -371,7 +372,7 @@ export const AdminProvider = ({ children }) => {
     );
 
     // Sync to Frontend API so customer tracking advances in real time
-    fetch('http://localhost:5174/api/orders', {
+    fetch(`${getApiBase()}/api/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId, status: newStatus })
@@ -391,7 +392,7 @@ export const AdminProvider = ({ children }) => {
       prev.map((ord) => (ord.id === orderId ? { ...ord, ...updatedFields } : ord))
     );
 
-    fetch('http://localhost:5174/api/orders', {
+    fetch(`${getApiBase()}/api/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId, ...updatedFields })
@@ -405,7 +406,7 @@ export const AdminProvider = ({ children }) => {
       prev.map((ord) => (ord.id === orderId ? { ...ord, status: 'Cancelled', cancelReason: reason } : ord))
     );
 
-    fetch('http://localhost:5174/api/orders', {
+    fetch(`${getApiBase()}/api/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: orderId, status: 'Cancelled', cancelReason: reason })
@@ -481,7 +482,7 @@ export const AdminProvider = ({ children }) => {
   const updateRestaurantSettings = (newSettings) => {
     setRestaurantSettings(newSettings);
     // Post to Frontend API so customer storefront updates delivery fees & policies immediately
-    fetch('http://localhost:5174/api/restaurant-settings', {
+    fetch(`${getApiBase()}/api/restaurant-settings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newSettings)

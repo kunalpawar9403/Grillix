@@ -46,6 +46,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { useAdmin } from '../context/AdminContext';
+import { getStorefrontUrl } from '../utils/navigation';
 
 export const AdminDashboard = () => {
   const { 
@@ -587,11 +588,11 @@ export const AdminDashboard = () => {
 
           {/* Quick link to Storefront */}
           <a
-            href="http://localhost:5174"
+            href={getStorefrontUrl()}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center justify-center space-x-1.5 py-2 rounded-xl bg-[#1b3311] hover:bg-[#254618] text-[#a8e83c] text-xs font-bold transition-colors border border-[#294c1a]"
-            title="Open Customer Food Delivery Store (http://localhost:5174)"
+            title="Open Customer Food Delivery Store"
           >
             <span>Customer Storefront</span>
             <ExternalLink size={12} />
