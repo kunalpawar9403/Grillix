@@ -45,7 +45,7 @@ export const HowItWorksScreen = () => {
               Earn Pts
             </h2>
             <p className="text-xs sm:text-sm text-[#EEF4E3]/90 leading-relaxed">
-              Scan in store or order ahead to get 10 points for every eligible $1 spent*
+              Scan in store or order ahead to get 10 points for every eligible ₹10 spent*
             </p>
           </div>
 

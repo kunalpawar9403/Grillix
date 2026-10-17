@@ -1,246 +1,183 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   ChevronLeft, 
-  Crosshair, 
-  Search, 
-  Sparkles, 
-  Star
+  Star,
+  MapPin,
+  Clock,
+  Phone,
+  Bike,
+  ShieldCheck,
+  Sparkles,
+  ArrowRight,
+  ExternalLink
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { RESTAURANTS } from '../data/mockData';
+import { RESTAURANT, RESTAURANTS } from '../data/mockData';
+import { RestaurantFinderMap } from '../components/map/RestaurantFinderMap';
 
 export const DiscoveryScreen = () => {
   const { 
     goBack, 
     navigateTo, 
-    discoveryFilter, 
-    setDiscoveryFilter,
-    setSelectedRestaurant,
-    showToast 
+    selectedRestaurant, 
+    setSelectedRestaurant
   } = useApp();
 
-  const [searchLocation, setSearchLocation] = useState('Center Drive #E160Lone');
-
-  const handleSelectRestaurant = (restaurant) => {
-    setSelectedRestaurant(restaurant);
-    navigateTo('restaurant-detail', { restaurant });
-  };
+  const currentRest = selectedRestaurant || RESTAURANT;
 
   return (
     <div className="w-full min-h-screen pb-28 md:pb-12 animate-fadeIn bg-[#EEF4E3]">
-      {/* Container - Responsive layout: mobile full height stack, desktop 2-column */}
-      <div className="max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 pt-0 sm:pt-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-6">
-          
-          {/* Map Column (Mobile: top portion; Desktop: interactive left panel) */}
-          <div className="lg:col-span-7 relative h-[420px] sm:h-[460px] lg:h-[680px] rounded-none sm:rounded-3xl overflow-hidden shadow-sm bg-[#385514]">
-            
-            {/* SVG Interactive Stylized Street Map */}
-            <div className="absolute inset-0 select-none overflow-hidden">
-              <svg className="w-full h-full" viewBox="0 0 500 500" preserveAspectRatio="none">
-                <defs>
-                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#2F4711" strokeWidth="0.8" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="#385514" />
-                <rect width="100%" height="100%" fill="url(#grid)" />
-
-                {/* Stylized road network */}
-                {/* Diagonal Highway */}
-                <path d="M-50,450 L550,-50" stroke="#48691A" strokeWidth="24" strokeLinecap="round" />
-                <path d="M-50,450 L550,-50" stroke="#53791E" strokeWidth="18" strokeLinecap="round" />
-                
-                {/* Cross Avenue */}
-                <path d="M-20,100 L520,380" stroke="#48691A" strokeWidth="20" />
-                <path d="M-20,100 L520,380" stroke="#53791E" strokeWidth="14" />
-                
-                {/* Vertical Broadway */}
-                <path d="M410,-20 L410,520" stroke="#48691A" strokeWidth="16" />
-                <path d="M410,-20 L410,520" stroke="#53791E" strokeWidth="10" />
-
-                {/* Curved Waterfront */}
-                <path d="M50,-20 C120,180 180,300 250,520" fill="none" stroke="#48691A" strokeWidth="18" />
-                <path d="M50,-20 C120,180 180,300 250,520" fill="none" stroke="#53791E" strokeWidth="12" />
-
-                {/* Secondary streets */}
-                <path d="M120,140 L380,140" stroke="#466619" strokeWidth="8" strokeDasharray="6,4" />
-                <path d="M160,260 L460,260" stroke="#466619" strokeWidth="8" />
-                <path d="M220,50 L220,360" stroke="#466619" strokeWidth="8" />
-                <path d="M30,300 L260,300" stroke="#466619" strokeWidth="8" />
-
-                {/* Street Name Typography Overlays matching screenshot */}
-                <text x="60" y="110" fill="#759C39" fontSize="9" fontWeight="700" letterSpacing="1.2" transform="rotate(-35 60 110)">HYDE PARK</text>
-                <text x="140" y="160" fill="#759C39" fontSize="9" fontWeight="700" letterSpacing="1.5" transform="rotate(30 140 160)">HUDSON SQUARE</text>
-                <text x="60" y="270" fill="#759C39" fontSize="9" fontWeight="700" letterSpacing="1.2" transform="rotate(22 60 270)">MILLENNIUM PARK</text>
-                <text x="395" y="80" fill="#759C39" fontSize="9" fontWeight="700" letterSpacing="1.5">BROADWAY</text>
-                <text x="360" y="170" fill="#759C39" fontSize="8" fontWeight="700" letterSpacing="1">HARBOR PARK ST</text>
-                <text x="375" y="240" fill="#759C39" fontSize="8" fontWeight="700" letterSpacing="1">CHINA TOWN</text>
-              </svg>
-
-              {/* Park Meadows Marker on Map matching screenshot */}
-              <div 
-                onClick={() => handleSelectRestaurant(RESTAURANTS[0])}
-                className="absolute top-[32%] left-[64%] -translate-x-1/2 -translate-y-1/2 cursor-pointer group flex flex-col items-center animate-bounce duration-1000"
-              >
-                <div className="bg-[#244507]/90 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-md mb-1 border border-[#A8E83C]/40 flex items-center space-x-1 whitespace-nowrap">
-                  <span>Park Meadows</span>
-                </div>
-                <div className="w-10 h-10 rounded-full border-2 border-white shadow-xl overflow-hidden bg-white ring-4 ring-[#A8E83C]/50">
-                  <img src={RESTAURANTS[0].image} alt="Park Meadows" className="w-full h-full object-cover" />
-                </div>
-              </div>
-
-              {/* Millennium Park Marker */}
-              <div 
-                onClick={() => handleSelectRestaurant(RESTAURANTS[1])}
-                className="absolute top-[54%] left-[28%] -translate-x-1/2 -translate-y-1/2 cursor-pointer group flex flex-col items-center"
-              >
-                <div className="bg-[#244507]/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md mb-1 border border-[#A8E83C]/30 flex items-center space-x-1 whitespace-nowrap">
-                  <span>Millennium Park</span>
-                </div>
-                <div className="w-8 h-8 rounded-full border-2 border-white shadow-lg overflow-hidden bg-white ring-2 ring-[#315B0B]">
-                  <img src={RESTAURANTS[1].image} alt="Millennium Park" className="w-full h-full object-cover" />
-                </div>
-              </div>
-            </div>
-
-            {/* Top Controls on Map matching screenshot */}
-            <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20">
-              {/* Back button */}
-              <button
-                onClick={goBack}
-                className="w-10 h-10 rounded-full bg-[#244507]/60 hover:bg-[#244507]/80 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-all active:scale-95 shadow-md"
-                aria-label="Go Back"
-              >
-                <ChevronLeft size={20} />
-              </button>
-
-              {/* Toggle Pills: Restaurants vs Dishes */}
-              <div className="bg-[#244507]/60 backdrop-blur-md p-1 rounded-full border border-white/20 flex items-center space-x-1">
-                <button
-                  onClick={() => setDiscoveryFilter('Restaurants')}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                    discoveryFilter === 'Restaurants'
-                      ? 'bg-[#315B0B] text-white shadow-xs'
-                      : 'text-white/80 hover:text-white'
-                  }`}
-                >
-                  Restaurants
-                </button>
-                <button
-                  onClick={() => {
-                    setDiscoveryFilter('Dishes');
-                    navigateTo('menu');
-                  }}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-                    discoveryFilter === 'Dishes'
-                      ? 'bg-[#315B0B] text-white shadow-xs'
-                      : 'text-white/80 hover:text-white'
-                  }`}
-                >
-                  Dishes
-                </button>
-              </div>
-
-              {/* Locate button */}
-              <button
-                onClick={() => showToast('GPS location updated')}
-                className="w-10 h-10 rounded-full bg-[#244507]/60 hover:bg-[#244507]/80 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-all active:scale-95 shadow-md"
-                aria-label="Current Location"
-              >
-                <Crosshair size={18} />
-              </button>
-            </div>
-
-            {/* Floating Search Bar on Map matching screenshot */}
-            <div className="absolute bottom-12 sm:bottom-6 left-4 right-4 z-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 sm:pt-4">
+        
+        {/* Top Header Controls */}
+        <div className="py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={goBack}
+              className="w-10 h-10 rounded-full bg-[#E3EBD3] hover:bg-[#D5E1C3] border border-[#D0D8C2] flex items-center justify-center text-[#243019] transition-all active:scale-95 shadow-xs"
+              aria-label="Back"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div>
               <div className="flex items-center space-x-2">
-                <div className="flex-1 bg-[#244507]/80 hover:bg-[#244507]/90 backdrop-blur-md border border-white/25 rounded-2xl px-4 py-2.5 flex items-center space-x-2.5 shadow-lg text-white">
-                  <Search size={18} className="text-[#A8E83C] shrink-0" />
-                  <div className="flex-1">
-                    <span className="text-[10px] block text-white/70 font-bold leading-none">Park Meadows</span>
-                    <input
-                      type="text"
-                      value={searchLocation}
-                      onChange={(e) => setSearchLocation(e.target.value)}
-                      placeholder="Center Drive #E160Lone"
-                      className="bg-transparent text-xs font-semibold text-white focus:outline-none w-full underline decoration-white/40"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => showToast('Refined map search')}
-                  className="w-11 h-11 rounded-2xl bg-[#3B5B16]/90 hover:bg-[#4E761E] border border-white/25 backdrop-blur-md flex items-center justify-center text-[#A8E83C] shadow-lg transition-all active:scale-95 shrink-0"
-                  aria-label="Filter Map"
-                >
-                  <Sparkles size={18} />
-                </button>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#315B0B]">
+                  Flagship Central Kitchen & Dining
+                </span>
               </div>
+              <h1 className="text-xl sm:text-2xl font-black text-[#244507] tracking-tight">
+                {currentRest.name}
+              </h1>
             </div>
           </div>
 
-          {/* Restaurant Bottom Sheet matching screenshot 1 */}
-          <div className="lg:col-span-5 bg-white rounded-t-4xl lg:rounded-3xl -mt-6 lg:mt-0 relative z-30 p-5 pt-6 space-y-4 border-t lg:border border-[#D0D8C2] shadow-xl lg:shadow-xs">
-            <div className="flex items-center justify-between pb-1">
-              <div>
-                <h2 className="text-xl font-extrabold text-[#243019]">Kitchen Locations</h2>
-                <p className="text-xs text-[#747B68]">Fresh pickup and carbon-neutral courier</p>
-              </div>
-              <span className="bg-[#EEF4E3] text-[#244507] text-xs font-bold px-3 py-1 rounded-full border border-[#D0D8C2]">
-                {RESTAURANTS.length} Near You
-              </span>
-            </div>
-
-            {/* Restaurant Cards list */}
-            {RESTAURANTS.map((rest) => (
-              <div
-                key={rest.id}
-                className="bg-[#EEF4E3] rounded-3xl p-4 border border-[#D0D8C2] shadow-xs flex items-center space-x-3.5 transition-all hover:border-[#315B0B]/50"
-              >
-                {/* Photo thumbnail */}
-                <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0 bg-stone-200 shadow-xs">
-                  <img
-                    src={rest.image}
-                    alt={rest.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm sm:text-base font-extrabold text-[#243019] truncate">
-                      {rest.name}
-                    </h3>
-                    <div className="flex items-center space-x-1 text-xs font-bold text-[#315B0B]">
-                      <Star size={12} className="fill-current" />
-                      <span>{rest.rating}</span>
-                    </div>
-                  </div>
-
-                  <p className="text-[11px] text-[#747B68] leading-tight line-clamp-2">
-                    {rest.shortAddress || rest.address}
-                  </p>
-
-                  <div className="pt-1 flex items-center justify-between">
-                    <button
-                      onClick={() => handleSelectRestaurant(rest)}
-                      className="px-4 py-1.5 rounded-full bg-[#315B0B] hover:bg-[#244507] text-white text-xs font-bold transition-all shadow-xs active:scale-95"
-                    >
-                      More Details
-                    </button>
-                    <span className="text-[10px] font-bold text-[#747B68]">
-                      {rest.distance} away
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
+          <button
+            onClick={() => navigateTo('menu')}
+            className="flex items-center space-x-2 bg-[#244507] hover:bg-[#315B0B] text-[#A8E83C] px-4 py-2 rounded-full font-black text-xs transition-all shadow-md active:scale-95 shrink-0"
+          >
+            <span>Order Menu</span>
+            <ArrowRight size={14} />
+          </button>
         </div>
+
+        {/* 2-Column Grid: Live Map on Left, Restaurant Showcase on Right */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-2">
+          
+          {/* Live Map Column */}
+          <div className="lg:col-span-7 h-[420px] sm:h-[480px] lg:h-[620px] rounded-3xl overflow-hidden border border-[#D0D8C2] shadow-sm relative">
+            <RestaurantFinderMap 
+              restaurants={RESTAURANTS}
+              selectedRestaurant={currentRest}
+              onSelectRestaurant={(r) => setSelectedRestaurant(r)}
+              className="w-full h-full"
+            />
+          </div>
+
+          {/* Single Restaurant Details Column */}
+          <div className="lg:col-span-5 bg-white rounded-3xl p-6 space-y-5 border border-[#D0D8C2] shadow-sm flex flex-col justify-between">
+            
+            <div className="space-y-4">
+              {/* Photo & Rating Banner */}
+              <div className="relative h-44 rounded-2xl overflow-hidden bg-stone-100 border border-[#D0D8C2]/60 shadow-xs">
+                <img
+                  src={currentRest.image}
+                  alt={currentRest.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
+                  <div>
+                    <h3 className="font-extrabold text-base">{currentRest.shortName}</h3>
+                    <p className="text-xs text-[#d4f598] font-medium">{currentRest.shortAddress}</p>
+                  </div>
+                  <div className="bg-[#244507]/90 backdrop-blur-md px-2.5 py-1 rounded-xl flex items-center space-x-1 text-xs font-black text-[#A8E83C] border border-[#A8E83C]/30">
+                    <Star size={12} className="fill-current" />
+                    <span>{currentRest.rating} ({currentRest.reviewsCount})</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Quick Facts Grid */}
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-[#EEF4E3] p-3 rounded-2xl border border-[#D0D8C2]/60 space-y-1">
+                  <div className="flex items-center space-x-1.5 text-[#315B0B] font-extrabold">
+                    <Clock size={14} />
+                    <span>Operating Hours</span>
+                  </div>
+                  <p className="font-bold text-[#243019]">{currentRest.hours}</p>
+                  <span className="text-[10px] text-emerald-700 font-semibold">● Open Now for Delivery</span>
+                </div>
+
+                <div className="bg-[#EEF4E3] p-3 rounded-2xl border border-[#D0D8C2]/60 space-y-1">
+                  <div className="flex items-center space-x-1.5 text-[#315B0B] font-extrabold">
+                    <Bike size={14} />
+                    <span>Delivery Speed</span>
+                  </div>
+                  <p className="font-bold text-[#243019]">20 - 30 Mins Avg</p>
+                  <span className="text-[10px] text-[#747B68] font-semibold">Zero-emission EV Fleet</span>
+                </div>
+              </div>
+
+              {/* Address & Contact Row */}
+              <div className="bg-[#F6FAF0] p-4 rounded-2xl border border-[#D0D8C2]/80 space-y-2 text-xs">
+                <div className="flex items-start space-x-2.5">
+                  <MapPin size={16} className="text-[#315B0B] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-extrabold text-[#243019] block">Restaurant Address</span>
+                    <p className="text-[#747B68] leading-relaxed">{currentRest.address}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-[#D0D8C2]/50 text-xs">
+                  <div className="flex items-center space-x-2 text-[#243019] font-bold">
+                    <Phone size={13} className="text-[#315B0B]" />
+                    <span>{currentRest.phone}</span>
+                  </div>
+                  <span className="text-[11px] text-[#315B0B] font-extrabold bg-[#EEF4E3] px-2.5 py-1 rounded-full border border-[#D0D8C2]/60">
+                    FSSAI 5-Star Clean
+                  </span>
+                </div>
+              </div>
+
+              {/* Amenities Tags */}
+              <div>
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#747B68] block mb-2">
+                  Kitchen & Dining Highlights
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {currentRest.amenities.map((item, idx) => (
+                    <span
+                      key={idx}
+                      className="text-xs font-semibold bg-[#EEF4E3] text-[#244507] px-3 py-1 rounded-full border border-[#D0D8C2]/70 flex items-center space-x-1"
+                    >
+                      <Sparkles size={11} className="text-[#315B0B]" />
+                      <span>{item}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-4 border-t border-[#D0D8C2] grid grid-cols-2 gap-3">
+              <button
+                onClick={() => navigateTo('menu')}
+                className="w-full bg-[#244507] hover:bg-[#315B0B] text-white py-3 rounded-2xl font-black text-xs sm:text-sm transition-all shadow-md active:scale-95 text-center"
+              >
+                Order for Delivery
+              </button>
+              <button
+                onClick={() => navigateTo('custom-bowl')}
+                className="w-full bg-[#E3EBD3] hover:bg-[#D5E1C3] text-[#244507] border border-[#D0D8C2] py-3 rounded-2xl font-black text-xs sm:text-sm transition-all active:scale-95 text-center"
+              >
+                Build Custom Bowl
+              </button>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   );

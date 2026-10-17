@@ -234,7 +234,7 @@ export const CustomBowlScreen = () => {
                 {baseItem.name} + {veggieItems.map(v => v.name).join(', ')} + {proteinItem.name} + {dressingItem.name}
               </p>
               <div className="mt-2 flex items-center space-x-2">
-                <span className="text-lg font-black text-[#315B0B]">${totalPrice.toFixed(2)}</span>
+                <span className="text-lg font-black text-[#315B0B]">₹{totalPrice.toFixed(0)}</span>
                 <span className="text-[11px] bg-[#EEF4E3] text-[#315B0B] font-bold px-2 py-0.5 rounded-full border border-[#D0D8C2]">
                   Base $13.50
                 </span>
@@ -446,7 +446,7 @@ export const CustomBowlScreen = () => {
                         </div>
                         {p.priceAdd > 0 && (
                           <span className="text-xs font-extrabold text-[#315B0B] mt-1 block">
-                            +${p.priceAdd.toFixed(2)} premium add
+                            +₹{p.priceAdd.toFixed(2)} premium add
                           </span>
                         )}
                       </div>
@@ -540,7 +540,7 @@ export const CustomBowlScreen = () => {
                         </div>
                         <div className="text-xs text-[#747B68] mt-0.5 space-x-2">
                           <span>{top.cal} kcal</span>
-                          {top.priceAdd > 0 && <span className="font-bold text-[#315B0B]">+${top.priceAdd.toFixed(2)}</span>}
+                          {top.priceAdd > 0 && <span className="font-bold text-[#315B0B]">+₹{top.priceAdd.toFixed(2)}</span>}
                         </div>
                       </div>
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center border ${
@@ -588,7 +588,7 @@ export const CustomBowlScreen = () => {
               onClick={handleAddCustomBowl}
               className="w-full sm:w-auto py-3.5 px-6 rounded-full bg-[#315B0B] hover:bg-[#244507] text-white font-extrabold text-sm shadow-md transition-all active:scale-95 flex items-center justify-center space-x-2"
             >
-              <span>Add Custom Bowl • ${totalPrice.toFixed(2)}</span>
+              <span>Add Custom Bowl • ₹{totalPrice.toFixed(0)}</span>
               <ShoppingBag size={16} />
             </button>
           </div>

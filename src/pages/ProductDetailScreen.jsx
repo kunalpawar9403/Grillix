@@ -92,7 +92,7 @@ export const ProductDetailScreen = () => {
             <div className="grid grid-cols-4 gap-1.5 sm:gap-2 py-3 sm:py-4 px-2 sm:px-6 rounded-2xl bg-[#EEF4E3] border border-[#D0D8C2] text-center">
               <div>
                 <span className="block text-[9px] sm:text-xs text-[#747B68] font-bold">Menu Price</span>
-                <span className="text-xs sm:text-sm font-extrabold text-[#315B0B]">${product.menuPrice.toFixed(2)}</span>
+                <span className="text-xs sm:text-sm font-extrabold text-[#315B0B]">₹{product.menuPrice.toFixed(0)}</span>
               </div>
               <div>
                 <span className="block text-[9px] sm:text-xs text-[#747B68] font-bold">Est. Calories</span>
@@ -191,7 +191,7 @@ export const ProductDetailScreen = () => {
                 className="flex-1 py-3.5 px-6 rounded-full bg-[#315B0B] hover:bg-[#244507] text-white font-extrabold text-sm sm:text-base flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
               >
                 <ShoppingBag size={18} />
-                <span>Add to Bag • ${(product.menuPrice * quantity).toFixed(2)}</span>
+                <span>Add to Bag • ₹{(product.menuPrice * quantity).toFixed(0)}</span>
               </button>
             </div>
 

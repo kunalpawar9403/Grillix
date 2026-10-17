@@ -1,0 +1,86 @@
+{
+  "orders": [
+    {
+      "id": "GRX-IND-101",
+      "customerName": "Aarav Mehta",
+      "customerPhone": "+91 98331 22441",
+      "address": "Villa 12, Palm Meadows, Whitefield, Bengaluru 560066",
+      "date": "Today, 12:45 PM",
+      "total": 518,
+      "status": "Delivering",
+      "items": [
+        "Golden Sesame Crispy Tofu Bowl",
+        "Green Veggie Bowl"
+      ],
+      "assignedRider": "Vikram Singh",
+      "paymentMethod": "UPI (Google Pay)",
+      "deliveryNotes": "Leave with security at main gate"
+    },
+    {
+      "id": "GRX-IND-102",
+      "customerName": "Ananya Deshmukh",
+      "customerPhone": "+91 98114 77890",
+      "address": "Flat 701, Riverdale Heights, Koregaon Park, Pune 411001",
+      "date": "Today, 12:50 PM",
+      "total": 319,
+      "status": "Preparing",
+      "items": [
+        "Herb & Bean Patty Sandwich"
+      ],
+      "assignedRider": "Aisha Khan",
+      "paymentMethod": "PhonePe UPI",
+      "deliveryNotes": "Call upon arrival"
+    },
+    {
+      "id": "GRX-IND-103",
+      "customerName": "Rohan Verma",
+      "customerPhone": "+91 98990 12345",
+      "address": "Tower B-402, DLF Phase 5, Golf Course Rd, Gurugram 122009",
+      "date": "Today, 12:55 PM",
+      "total": 279,
+      "status": "Received",
+      "items": [
+        "Avocado Citrus & Baby Fennel Salad"
+      ],
+      "assignedRider": "Unassigned",
+      "paymentMethod": "Paytm Wallet",
+      "deliveryNotes": "Ring bell twice"
+    },
+    {
+      "id": "GRX-IND-100",
+      "customerName": "Kunal Pawar",
+      "customerPhone": "+91 98200 11223",
+      "address": "Flat 502, Green Meadows Residency, Spine Road, Moshi, Pune 412105",
+      "date": "Yesterday, 8:15 PM",
+      "total": 588,
+      "status": "Delivered",
+      "items": [
+        "Tofu Crunch High-Protein Bowl",
+        "Detox Cold-Pressed Green Juice"
+      ],
+      "assignedRider": "Rohit Shinde",
+      "paymentMethod": "Credit Card (HDFC)",
+      "deliveryNotes": "Delivered at door"
+    }
+  ],
+  "kitchenStatus": "Online",
+  "settings": {
+    "name": "GRILLIX Restaurant & Central Kitchen",
+    "tagline": "Farm-Fresh Gourmet Bowls & Superfoods",
+    "phone": "+91 98200 44888",
+    "email": "kitchen.moshi@grillix.in",
+    "address": "Shop 12, Grand Spine Avenue, Pune-Nashik Highway, Moshi",
+    "city": "Pune, Maharashtra 412105",
+    "openTime": "08:00 AM",
+    "closeTime": "11:30 PM",
+    "prepTimeMinutes": 25,
+    "deliveryRadiusKm": 8.5,
+    "minOrderValue": 149,
+    "deliveryFee": 39,
+    "freeDeliveryThreshold": 499,
+    "taxRatePercent": 5,
+    "deliveryEnabled": true,
+    "announcement": "🌿 Using 100% hydroponic organic greens and cold-pressed olive oils in Moshi, Pune!"
+  },
+  "lastUpdated": "2026-10-17T11:55:00.000Z"
+}

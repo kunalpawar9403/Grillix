@@ -1,15 +1,71 @@
-export const USER_PROFILE = {
-  name: "Jhon Snow",
-  handle: "@shahinurstk02",
-  email: "shahinurstk02@gmail.com",
-  avatar: "/images/avatar-jhon.jpg",
-  points: 3500,
-  homePointsDisplay: 32,
-  address: "Center Drive #E160 Lone Tree, CO 80124",
-  tier: "Gold Tier Member",
-  ordersCount: 24,
-  favoriteKitchen: "Park Meadows Kitchen"
-};
+export const INITIAL_USERS = [
+  {
+    id: "user-kunal",
+    name: "Kunal Pawar",
+    handle: "@kunalpawar",
+    email: "kunalpawar9403@gmail.com",
+    avatar: "/images/avatar-jhon.jpg",
+    points: 150,
+    homePointsDisplay: 15,
+    address: "Flat 502, Green Meadows Residency, Spine Road, Moshi, Pune 412105",
+    city: "Moshi, Pune",
+    tier: "Gold Tier Member",
+    phone: "+91 98201 44321",
+    dietary: ["Organic Greens", "High Protein", "Non-GMO"],
+    ordersCount: 0,
+    favoriteKitchen: "GRILLIX Central Kitchen (Moshi, Pune)"
+  },
+  {
+    id: "user-aarav",
+    name: "Aarav Mehta",
+    handle: "@aaravm",
+    email: "aarav.mehta@gmail.com",
+    avatar: "/images/avatar-jhon.jpg",
+    points: 220,
+    homePointsDisplay: 22,
+    address: "Villa 12, Palm Meadows, Whitefield, Bengaluru 560066",
+    city: "Bengaluru, KA",
+    tier: "Platinum Tier",
+    phone: "+91 98331 22441",
+    dietary: ["Vegan", "Gluten-Free"],
+    ordersCount: 0,
+    favoriteKitchen: "Indiranagar Kitchen"
+  },
+  {
+    id: "user-ananya",
+    name: "Ananya Deshmukh",
+    handle: "@ananya_d",
+    email: "ananya.d@gmail.com",
+    avatar: "/images/avatar-jhon.jpg",
+    points: 180,
+    homePointsDisplay: 18,
+    address: "Flat 701, Riverdale Heights, Koregaon Park, Pune 411001",
+    city: "Pune, MH",
+    tier: "Gold Tier Member",
+    phone: "+91 98114 77890",
+    dietary: ["High Protein", "Keto Friendly"],
+    ordersCount: 0,
+    favoriteKitchen: "Koregaon Park Kitchen"
+  },
+  {
+    id: "user-rohan",
+    name: "Rohan Verma",
+    handle: "@rohan_v",
+    email: "rohan.verma@gmail.com",
+    avatar: "/images/avatar-jhon.jpg",
+    points: 100,
+    homePointsDisplay: 10,
+    address: "Tower B-402, DLF Phase 5, Golf Course Rd, Gurugram 122009",
+    city: "Gurugram, DL",
+    tier: "Silver Tier",
+    phone: "+91 98990 12345",
+    dietary: ["Organic Greens", "Dairy-Free"],
+    ordersCount: 0,
+    favoriteKitchen: "Cyber Hub Kitchen"
+  }
+];
+
+export const USER_PROFILE = INITIAL_USERS[0];
 
 export const FOOD_ITEMS = [
   {
@@ -18,7 +74,7 @@ export const FOOD_ITEMS = [
     shortName: "Greens Bowl",
     tagline: "Broccoli & Spinach Delight",
     description: "Steamed broccoli florets, baby spinach, garden sweet peas, edamame, and cracked black pepper tossed in cold-pressed Meyer lemon extra virgin olive oil.",
-    menuPrice: 12.75,
+    menuPrice: 249,
     calories: 800,
     ingredientCount: 12,
     deliveryTime: "55m",
@@ -47,7 +103,7 @@ export const FOOD_ITEMS = [
     shortName: "Rainbow Veggie",
     tagline: "High-Protein Superfood Bowl",
     description: "Sliced grilled herb chicken breast, fluffy tri-color quinoa, roasted cherry tomatoes, Haas avocado, shredded kale, and warm cilantro lime tahini.",
-    menuPrice: 14.75,
+    menuPrice: 299,
     calories: 680,
     ingredientCount: 9,
     deliveryTime: "40m",
@@ -75,7 +131,7 @@ export const FOOD_ITEMS = [
     shortName: "Miso Salmon Bowl",
     tagline: "Wild Alaskan Omega-3 Plate",
     description: "Pan-seared wild salmon with a sweet white miso glaze, served over wild black rice, blanched asparagus spears, pickled red cabbage, and sesame seeds.",
-    menuPrice: 16.50,
+    menuPrice: 399,
     calories: 620,
     ingredientCount: 10,
     deliveryTime: "35m",
@@ -102,7 +158,7 @@ export const FOOD_ITEMS = [
     shortName: "Crispy Tofu",
     tagline: "100% Plant-Powered Protein",
     description: "Air-crisped organic non-GMO tofu glazed in toasted sesame tamari, tender broccoli florets, edamame pods, grated ginger, and organic brown rice.",
-    menuPrice: 12.95,
+    menuPrice: 269,
     calories: 520,
     ingredientCount: 11,
     deliveryTime: "30m",
@@ -129,7 +185,7 @@ export const FOOD_ITEMS = [
     shortName: "Avocado Citrus",
     tagline: "Sunny California Harvest",
     description: "Hass avocado wedges, ruby red grapefruit segments, shaved baby fennel, wild baby arugula, toasted pumpkin seeds, and citrus poppy dressing.",
-    menuPrice: 11.95,
+    menuPrice: 279,
     calories: 460,
     ingredientCount: 8,
     deliveryTime: "25m",
@@ -156,7 +212,7 @@ export const FOOD_ITEMS = [
     shortName: "Herb & Bean",
     tagline: "Herb & Bean Patty Sandwich",
     description: "House-made black bean & herbed quinoa patty with garlic roasted peppers, Hass avocado, wild arugula, and green tahini on grilled sourdough.",
-    menuPrice: 11.50,
+    menuPrice: 319,
     calories: 550,
     ingredientCount: 8,
     deliveryTime: "30m",
@@ -183,7 +239,7 @@ export const FOOD_ITEMS = [
     shortName: "Springtime Greens",
     tagline: "Springtime Greens Plate",
     description: "Crisp organic romaine, Persian cucumbers, vine tomatoes, spiced chickpeas, Kalamata olives, and cold-pressed citrus vinaigrette.",
-    menuPrice: 10.50,
+    menuPrice: 289,
     calories: 480,
     ingredientCount: 10,
     deliveryTime: "35m",
@@ -210,7 +266,7 @@ export const FOOD_ITEMS = [
     shortName: "Green Glow Smoothie",
     tagline: "Cold-Pressed Superfood Drink",
     description: "Ceremonial Japanese matcha, organic spinach, crisp green apple, English cucumber, coconut water, and cold-pressed ginger root.",
-    menuPrice: 8.50,
+    menuPrice: 149,
     calories: 190,
     ingredientCount: 6,
     deliveryTime: "20m",
@@ -237,7 +293,7 @@ export const FOOD_ITEMS = [
     shortName: "Berry Acai Bowl",
     tagline: "Antioxidant Energy Bowl",
     description: "Wild organic Amazonian acai puree blended with blueberries and banana, topped with hemp seed granola, chia seeds, fresh strawberries, and raw honey drizzle.",
-    menuPrice: 9.75,
+    menuPrice: 199,
     calories: 340,
     ingredientCount: 8,
     deliveryTime: "25m",
@@ -264,7 +320,7 @@ export const FOOD_ITEMS = [
     shortName: "Rosemary Focaccia",
     tagline: "Free Reward Milestone Perk",
     description: "Naturally fermented sourdough focaccia baked golden with fresh organic rosemary sprigs, extra virgin olive oil, and Maldon flaky sea salt.",
-    menuPrice: 5.50,
+    menuPrice: 129,
     calories: 280,
     ingredientCount: 5,
     deliveryTime: "20m",
@@ -287,98 +343,46 @@ export const FOOD_ITEMS = [
   }
 ];
 
-export const RESTAURANTS = [
-  {
-    id: "park-meadows",
-    name: "Park Meadows",
-    shortName: "Park Meadows",
-    city: "Lone Tree, CO",
-    address: "8423 Park Meadows Center Drive #E160 Lone Tree, CO 80124",
-    shortAddress: "Center Drive #E160 Lone Tree, CO 80124",
-    hours: "Mon-Sun 10:00am - 8:00pm",
-    image: "/images/restaurant-interior-1.jpg",
-    rating: 4.9,
-    distance: "0.8 mi",
-    reviewsCount: 342,
-    coordinates: { x: 70, y: 38 },
-    amenities: ["Outdoor Patio", "Order Ahead", "Curbside Pickup", "Contactless Pay"]
-  },
-  {
-    id: "millennium-park",
-    name: "Millennium Park",
-    shortName: "Millennium Park",
-    city: "Chicago, IL",
-    address: "150 N Michigan Ave Chicago IL 60601",
-    shortAddress: "150 N Michigan Ave Chicago IL 60601",
-    hours: "Mon-Sun 9:00am - 9:00pm",
-    image: "/images/restaurant-interior-2.jpg",
-    rating: 4.8,
-    distance: "1.4 mi",
-    reviewsCount: 512,
-    coordinates: { x: 30, y: 55 },
-    amenities: ["Spacious Dining", "Express Pick-up", "Cold Brew Bar", "EV Charging"]
-  },
-  {
-    id: "hudson-square",
-    name: "Hudson Square",
-    shortName: "Hudson Square",
-    city: "New York, NY",
-    address: "375 Hudson St, New York, NY 10014",
-    shortAddress: "375 Hudson St, New York, NY",
-    hours: "Mon-Sat 10:30am - 8:30pm",
-    image: "/images/restaurant-interior-1.jpg",
-    rating: 4.9,
-    distance: "2.1 mi",
-    reviewsCount: 289,
-    coordinates: { x: 45, y: 24 },
-    amenities: ["Organic Juice Bar", "Indoor Garden", "Bike Racks"]
-  },
-  {
-    id: "venice-beach",
-    name: "Venice Beach Organic Lab",
-    shortName: "Venice Beach",
-    city: "Los Angeles, CA",
-    address: "1428 Abbot Kinney Blvd, Venice, CA 90291",
-    shortAddress: "1428 Abbot Kinney Blvd, Venice, CA",
-    hours: "Mon-Sun 8:00am - 9:00pm",
-    image: "/images/restaurant-interior-3.jpg",
-    rating: 4.95,
-    distance: "3.2 mi",
-    reviewsCount: 618,
-    coordinates: { x: 22, y: 72 },
-    amenities: ["Sunlit Terrace", "Cold-Pressed Bar", "Dog Friendly", "Surfboard Racks"]
-  },
-  {
-    id: "cherry-creek",
-    name: "Cherry Creek Sustainable Kitchen",
-    shortName: "Cherry Creek",
-    city: "Denver, CO",
-    address: "2816 E 3rd Ave, Denver, CO 80206",
-    shortAddress: "2816 E 3rd Ave, Denver, CO",
-    hours: "Mon-Sun 9:30am - 8:30pm",
-    image: "/images/restaurant-interior-4.jpg",
-    rating: 4.88,
-    distance: "4.5 mi",
-    reviewsCount: 420,
-    coordinates: { x: 80, y: 48 },
-    amenities: ["Velvet Booth Seating", "Organic Wine Bar", "Valet Pickup", "Heated Patio"]
-  },
-  {
-    id: "soho-kitchen",
-    name: "SoHo Farm-to-Table Kitchen",
-    shortName: "SoHo Kitchen",
-    city: "New York, NY",
-    address: "472 Broome St, New York, NY 10013",
-    shortAddress: "472 Broome St, New York, NY",
-    hours: "Mon-Sun 10:00am - 10:00pm",
-    image: "/images/restaurant-interior-2.jpg",
-    rating: 4.92,
-    distance: "5.1 mi",
-    reviewsCount: 785,
-    coordinates: { x: 58, y: 28 },
-    amenities: ["Private Dining Room", "Zero Waste Certified", "Acoustic Seating"]
-  }
-];
+export const RESTAURANT = {
+  id: "grillix-restaurant",
+  name: "GRILLIX Restaurant & Central Kitchen",
+  shortName: "GRILLIX Moshi, Pune",
+  tagline: "Farm-Fresh Gourmet Bowls & 100% Organic Kitchen",
+  city: "Pune, MH",
+  address: "Shop 12, Grand Spine Avenue, Pune-Nashik Highway, Moshi, Pune 412105",
+  shortAddress: "Spine Rd, Moshi, Pune",
+  phone: "+91 98200 44888",
+  email: "kitchen.moshi@grillix.in",
+  hours: "Mon-Sun 8:00 AM - 11:30 PM",
+  image: "/images/restaurant-interior-1.jpg",
+  gallery: [
+    "/images/restaurant-interior-1.jpg",
+    "/images/restaurant-interior-2.jpg",
+    "/images/restaurant-interior-3.jpg",
+    "/images/restaurant-interior-4.jpg"
+  ],
+  rating: 4.95,
+  reviewsCount: 1480,
+  distance: "Within Delivery Zone",
+  lat: 18.6738,
+  lng: 73.8485,
+  coordinates: { x: 50, y: 50 },
+  deliveryRadiusKm: 8.5,
+  deliveryFee: 39,
+  freeDeliveryThreshold: 499,
+  minOrderValue: 149,
+  prepTimeMinutes: 25,
+  amenities: [
+    "Express EV Home Delivery across Moshi & PCMC",
+    "Curbside Pickup on Spine Road",
+    "Open Hydroponic Salad Bar",
+    "Cold-Pressed Superfood Juices",
+    "Contactless UPI & GPay",
+    "FSSAI 5-Star Clean Certified"
+  ]
+};
+
+export const RESTAURANTS = [RESTAURANT];
 
 export const GIFT_CARDS = [
   {
@@ -389,7 +393,7 @@ export const GIFT_CARDS = [
     subheadline: "GIFT CARD",
     image: "/images/gift-card-fathers-day.jpg",
     badge: "Most Popular",
-    options: [25, 50, 75, 100],
+    options: [500, 1000, 1500, 2000],
     description: "Give the gift of wholesome, handcrafted meals prepared with farm-fresh ingredients."
   },
   {
@@ -401,7 +405,7 @@ export const GIFT_CARDS = [
     discountTag: "10% OFF",
     image: "/images/gift-card-spring.jpg",
     badge: "Seasonal Offer",
-    options: [20, 40, 60, 100],
+    options: [400, 800, 1200, 2000],
     description: "Embrace spring vitality with seasonal salads, fresh grain bowls, and plant-powered fuel."
   },
   {
@@ -413,28 +417,28 @@ export const GIFT_CARDS = [
     discountTag: "BONUS 50 PTS",
     image: "/images/rainbow-quinoa-bowl.jpg",
     badge: "Special Thanks",
-    options: [15, 30, 50, 75],
+    options: [300, 600, 1000, 1500],
     description: "Show appreciation with healthy nutrition that leaves everyone feeling their best."
   }
 ];
 
 export const REWARDS_DATA = {
-  currentPoints: 3500,
-  nextMilestone: 3850,
-  nextMilestoneReward: "Free Rosemary Focaccia",
-  ptsRemaining: 350,
+  currentPoints: 150,
+  nextMilestone: 350,
+  nextMilestoneReward: "Free Cold-Pressed Juice or Kombucha",
+  ptsRemaining: 200,
   drinkMilestone: "A free drink is 200 pts away!",
   specialPromotion: {
     title: "Buy More & Get Rewards",
-    description: "Order an entree + get 110 points Limit 1 per customer",
-    expiry: "Ends with 05/31",
+    description: "Order an entree + get 110 points. Limit 1 per customer",
+    expiry: "Valid this week",
     image: "/images/rainbow-quinoa-bowl.jpg",
     tag: "Get Details"
   },
   howItWorks: [
     {
       title: "Earn Pts",
-      text: "Scan in store or order ahead to get 10 points for every eligible $1 spent*"
+      text: "Scan in store or order ahead to get 10 points for every eligible ₹10 spent*"
     },
     {
       title: "Get more",
@@ -447,18 +451,7 @@ export const REWARDS_DATA = {
   ]
 };
 
-export const INITIAL_CART_ITEMS = [
-  {
-    item: FOOD_ITEMS[1], // Rainbow Veggie Quinoa Power Bowl
-    quantity: 2,
-    customizations: "Herbed shredded, extra avocado"
-  },
-  {
-    item: FOOD_ITEMS[4], // Avocado Citrus Salad
-    quantity: 1,
-    customizations: "Citrus poppy dressing on side"
-  }
-];
+export const INITIAL_CART_ITEMS = [];
 
 export const REDEEMABLE_PERKS = [
   {
@@ -481,12 +474,12 @@ export const REDEEMABLE_PERKS = [
   },
   {
     id: "perk-discount-5",
-    title: "$5 Off Any Harvest Bowl or Plate",
+    title: "₹50 Off Any Harvest Bowl or Plate",
     pointsCost: 500,
     category: "Discount",
     code: "GRILLIX5OFF",
     image: "/images/green-veggie-bowl.jpg",
-    description: "$5.00 immediate discount applied on any scratch-cooked signature bowl or plate."
+    description: "₹50 immediate discount applied on any fresh signature bowl."
   },
   {
     id: "perk-avocado",
@@ -516,9 +509,9 @@ export const CUSTOM_BOWL_OPTIONS = {
   ],
   proteins: [
     { id: "chicken", name: "Grilled Herb Free-Range Chicken", cal: 210, protein: 32, carbs: 0, fat: 6, fiber: 0, priceAdd: 0, tag: "Signature" },
-    { id: "salmon", name: "Pan-Seared Wild Alaskan Salmon", cal: 240, protein: 28, carbs: 0, fat: 12, fiber: 0, priceAdd: 3.50, tag: "Wild Caught" },
+    { id: "salmon", name: "Pan-Seared Wild Alaskan Salmon", cal: 240, protein: 28, carbs: 0, fat: 12, fiber: 0, priceAdd: 80, tag: "Wild Caught" },
     { id: "tofu", name: "Crispy Tamari Sprouted Organic Tofu", cal: 160, protein: 18, carbs: 5, fat: 8, fiber: 2, priceAdd: 0, tag: "100% Vegan" },
-    { id: "steak", name: "Grass-Fed Rosemary Flank Steak", cal: 250, protein: 30, carbs: 0, fat: 11, fiber: 0, priceAdd: 4.00, tag: "Grass-Fed" },
+    { id: "steak", name: "Grass-Fed Rosemary Flank Steak", cal: 250, protein: 30, carbs: 0, fat: 11, fiber: 0, priceAdd: 90, tag: "Grass-Fed" },
     { id: "egg", name: "Two Pasture-Raised Soft Boiled Eggs", cal: 140, protein: 12, carbs: 1, fat: 10, fiber: 0, priceAdd: 0, tag: "Pasture-Raised" }
   ],
   dressings: [
@@ -529,10 +522,10 @@ export const CUSTOM_BOWL_OPTIONS = {
     { id: "lime-vinaigrette", name: "Zesty Lime Cilantro Vinaigrette", cal: 70, fat: 7, dietary: "Vegan, Light" }
   ],
   toppings: [
-    { id: "avocado", name: "Fresh Hass Avocado Half", cal: 120, priceAdd: 1.75, tag: "Healthy Fats" },
+    { id: "avocado", name: "Fresh Hass Avocado Half", cal: 120, priceAdd: 40, tag: "Healthy Fats" },
     { id: "pumpkin-seeds", name: "Toasted Spiced Pumpkin Seeds", cal: 60, priceAdd: 0, tag: "Zinc Rich" },
     { id: "crispy-shallots", name: "Golden Crispy Shallots", cal: 45, priceAdd: 0, tag: "Crunch" },
-    { id: "feta", name: "Crumbled Sheep's Milk Feta", cal: 70, priceAdd: 1.00, tag: "Artisan" },
+    { id: "feta", name: "Crumbled Sheep's Milk Feta", cal: 70, priceAdd: 30, tag: "Artisan" },
     { id: "sesame", name: "Toasted White & Black Sesame", cal: 35, priceAdd: 0, tag: "Mineral Rich" }
   ]
 };

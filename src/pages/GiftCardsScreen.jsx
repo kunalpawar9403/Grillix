@@ -39,7 +39,7 @@ export const GiftCardsScreen = () => {
         origin: { y: 0.6 }
       });
     } catch {}
-    showToast(`$${selectedAmount} GRILLIX Gift Card sent to ${recipientEmail}!`);
+    showToast(`$₹{selectedAmount} GRILLIX Gift Card sent to ${recipientEmail}!`);
     setRecipientEmail('');
     setPersonalMessage('');
   };
@@ -292,7 +292,7 @@ export const GiftCardsScreen = () => {
                   type="submit"
                   className="w-full py-3 rounded-full bg-[#315B0B] hover:bg-[#244507] text-white font-extrabold text-sm shadow-md transition-all active:scale-98"
                 >
-                  Send ${selectedAmount} Gift Card
+                  Send ₹{selectedAmount} Gift Card
                 </button>
               </div>
             </form>

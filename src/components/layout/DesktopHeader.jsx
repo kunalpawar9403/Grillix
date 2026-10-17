@@ -10,7 +10,9 @@ import {
   User,
   LogOut,
   Clock,
-  Award
+  Award,
+  ExternalLink,
+  Shield
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { RESTAURANTS } from '../../data/mockData';
@@ -58,7 +60,7 @@ export const DesktopHeader = () => {
   const primaryNavLinks = [
     { id: 'menu', label: 'Menu', screen: 'menu' },
     { id: 'custom-bowl', label: 'Build Bowl', screen: 'custom-bowl', isSpecial: true },
-    { id: 'discovery', label: 'Kitchens', screen: 'discovery' },
+    { id: 'discovery', label: 'Our Restaurant', screen: 'discovery' },
     { id: 'rewards', label: 'Rewards', screen: 'rewards' },
   ];
 
@@ -79,6 +81,7 @@ export const DesktopHeader = () => {
 
   return (
     <header className="sticky top-0 z-40 bg-[#EEF4E3]/95 backdrop-blur-md border-b border-[#D0D8C2]/80 shadow-xs transition-all">
+
       {/* Sleek, Compact Desktop Header Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 lg:gap-4">
         
@@ -105,50 +108,19 @@ export const DesktopHeader = () => {
             </div>
           </button>
 
-          {/* Location Selector (Desktop) */}
-          <div ref={locationRef} className="relative hidden xl:block shrink-0">
-            <button
-              onClick={() => setLocationDropdownOpen(!locationDropdownOpen)}
-              className="flex items-center space-x-1.5 bg-[#E3EBD3] hover:bg-[#D8E2C6] px-3 py-1.5 rounded-full border border-[#D0D8C2] text-xs font-semibold text-[#243019] transition-colors"
-            >
-              <MapPin size={13} className="text-[#315B0B] shrink-0" />
-              <span className="max-w-[120px] truncate">{selectedRestaurant.name}</span>
-              <ChevronDown size={13} className={`text-[#747B68] shrink-0 transition-transform duration-200 ${locationDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {locationDropdownOpen && (
-              <div className="absolute left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-[#D0D8C2] p-2 z-50 animate-fadeIn">
-                <div className="px-3 py-2 text-[11px] font-bold text-[#747B68] uppercase tracking-wider border-b border-[#EEF4E3]">
-                  Select GRILLIX Kitchen
-                </div>
-                <div className="py-1 max-h-64 overflow-y-auto">
-                  {RESTAURANTS.map((rest) => (
-                    <button
-                      key={rest.id}
-                      onClick={() => {
-                        setSelectedRestaurant(rest);
-                        setLocationDropdownOpen(false);
-                        navigateTo('restaurant-detail', { restaurant: rest });
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-xl text-xs transition-colors flex items-center justify-between ${
-                        selectedRestaurant.id === rest.id 
-                          ? 'bg-[#EEF4E3] text-[#244507] font-bold' 
-                          : 'hover:bg-[#F5F8EF] text-[#243019]'
-                      }`}
-                    >
-                      <div className="truncate pr-2">
-                        <div className="font-bold truncate">{rest.name}</div>
-                        <div className="text-[11px] text-[#747B68] truncate">{rest.shortAddress}</div>
-                      </div>
-                      {selectedRestaurant.id === rest.id && (
-                        <span className="w-2 h-2 rounded-full bg-[#315B0B] shrink-0"></span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Restaurant Location & Live Delivery Badge (Desktop) */}
+          <button
+            onClick={() => navigateTo('discovery')}
+            className="hidden xl:flex items-center space-x-2 bg-[#E3EBD3] hover:bg-[#D8E2C6] px-3.5 py-1.5 rounded-full border border-[#D0D8C2] text-xs font-bold text-[#243019] transition-all hover:shadow-xs group shrink-0"
+            title="View Restaurant Location & Delivery Zone"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0"></span>
+            <MapPin size={13} className="text-[#315B0B] shrink-0" />
+            <span className="max-w-[170px] truncate">{selectedRestaurant?.shortAddress || 'Spine Rd, Moshi, Pune'}</span>
+            <span className="text-[10px] bg-[#244507] text-[#A8E83C] px-2 py-0.5 rounded-full font-black ml-1">
+              Live Kitchen
+            </span>
+          </button>
         </div>
 
         {/* Short, Concise Desktop Nav Links */}
@@ -247,6 +219,8 @@ export const DesktopHeader = () => {
                 <span className="text-[10px] text-[#747B68] font-semibold">PTS</span>
               </button>
 
+
+
               {/* Cart Bag Button */}
               <button
                 onClick={() => navigateTo('cart')}
@@ -327,6 +301,21 @@ export const DesktopHeader = () => {
                       <Clock size={15} className="text-[#315B0B]" />
                       <span>Order Tracking</span>
                     </button>
+
+                    <a
+                      href="http://localhost:5175"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="w-full px-4 py-2.5 text-left text-xs font-bold text-[#243019] hover:bg-[#EEF4E3] flex items-center justify-between transition-colors"
+                      title="Open Kitchen Partner Portal on Port 5175"
+                    >
+                      <div className="flex items-center space-x-2.5">
+                        <Shield size={15} className="text-[#315B0B]" />
+                        <span>Partner Console (Port 5175)</span>
+                      </div>
+                      <ExternalLink size={12} className="text-[#747B68]" />
+                    </a>
 
                     <div className="my-1 border-t border-[#EEF4E3]"></div>
 

@@ -1,0 +1,30 @@
+{
+  "name": "GRILLIX — Eat Fresh, Live Healthy",
+  "short_name": "GRILLIX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EEF4E3",
+  "theme_color": "#244507",
+  "orientation": "portrait",
+  "description": "Farm-fresh healthy food ordering. Fresh bowls, protein plates, salads, and personalized healthy dining.",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["food", "shopping", "lifestyle"]
+}

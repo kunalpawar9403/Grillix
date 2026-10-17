@@ -7,7 +7,10 @@ import {
   Trash2, 
   Tag, 
   ArrowRight,
-  ShoppingBag
+  ShoppingBag,
+  Bike,
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
@@ -20,6 +23,12 @@ export const CartScreen = () => {
     cartSubtotal, 
     cartTotal,
     discountAmount,
+    deliveryFee,
+    isDeliveryFree,
+    freeDeliveryThreshold,
+    freeDeliveryRemaining,
+    minOrderValue,
+    restaurantSettings,
     appliedPromo, 
     promoError, 
     applyPromo, 
@@ -107,7 +116,7 @@ export const CartScreen = () => {
                     </p>
 
                     <div className="mt-2 text-sm sm:text-base font-extrabold text-[#315B0B]">
-                      ${(item.menuPrice * quantity).toFixed(2)}
+                      ₹{(item.menuPrice * quantity).toFixed(0)}
                     </div>
                   </div>
 
@@ -200,35 +209,80 @@ export const CartScreen = () => {
               {appliedPromo && (
                 <div className="flex items-center justify-between text-xs bg-[#EEF4E3] p-2.5 rounded-xl border border-[#315B0B]/30 text-[#315B0B] font-bold">
                   <span>Promo {appliedPromo.code} applied!</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
+                  <span>-₹{discountAmount.toFixed(0)}</span>
                 </div>
               )}
             </div>
 
+            {/* Free Delivery Incentive Bar */}
+            <div className="bg-white rounded-2xl p-3.5 border border-[#D0D8C2] shadow-xs flex items-center justify-between text-xs">
+              <div className="flex items-center space-x-2">
+                <Bike size={16} className="text-[#315B0B] shrink-0" />
+                {freeDeliveryRemaining > 0 ? (
+                  <span className="font-semibold text-[#243019]">
+                    Add <strong className="text-[#315B0B]">₹{freeDeliveryRemaining}</strong> more for <strong className="text-[#244507]">FREE Delivery</strong>!
+                  </span>
+                ) : (
+                  <span className="font-bold text-[#315B0B] flex items-center space-x-1">
+                    <Sparkles size={13} className="text-[#A8E83C] fill-current" />
+                    <span>Unlocked <strong>FREE Express EV Delivery</strong>!</span>
+                  </span>
+                )}
+              </div>
+              <span className="text-[10px] text-[#747B68] font-bold bg-[#EEF4E3] px-2 py-0.5 rounded-full">
+                Min ₹{freeDeliveryThreshold}
+              </span>
+            </div>
+
             {/* Subtotal & Checkout Section */}
-            <div className="bg-[#E3EBD3] rounded-3xl p-5 border border-[#D0D8C2] shadow-xs space-y-4">
-              {discountAmount > 0 && (
-                <div className="flex items-center justify-between text-xs text-[#747B68] font-semibold border-b border-[#D0D8C2]/60 pb-2">
-                  <span>Bag Subtotal</span>
-                  <span>${cartSubtotal.toFixed(2)}</span>
-                </div>
-              )}
+            <div className="bg-[#E3EBD3] rounded-3xl p-5 border border-[#D0D8C2] shadow-xs space-y-3.5">
+              
+              <div className="flex items-center justify-between text-xs text-[#747B68] font-semibold border-b border-[#D0D8C2]/60 pb-2">
+                <span>Items Subtotal</span>
+                <span className="text-[#243019] font-bold">₹{cartSubtotal.toFixed(0)}</span>
+              </div>
+
               {discountAmount > 0 && (
                 <div className="flex items-center justify-between text-xs text-[#315B0B] font-bold border-b border-[#D0D8C2]/60 pb-2">
-                  <span>Promo Discount</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
+                  <span>Promo Discount ({appliedPromo?.code})</span>
+                  <span>-₹{discountAmount.toFixed(0)}</span>
                 </div>
               )}
-              <div className="flex items-center justify-between text-sm sm:text-base font-bold text-[#243019]">
-                <span>Total Due</span>
-                <span className="text-[#315B0B] text-lg font-extrabold">
-                  ${cartTotal.toFixed(2)}
+
+              <div className="flex items-center justify-between text-xs text-[#747B68] font-semibold border-b border-[#D0D8C2]/60 pb-2">
+                <div className="flex items-center space-x-1">
+                  <span>Express EV Delivery</span>
+                  <span className="text-[10px] text-[#315B0B] bg-white/70 px-1.5 py-0.2 rounded font-mono">
+                    {restaurantSettings?.prepTimeMinutes || 25}m
+                  </span>
+                </div>
+                <span className={isDeliveryFree ? 'text-[#315B0B] font-black' : 'text-[#243019] font-bold'}>
+                  {isDeliveryFree ? 'FREE' : `₹${deliveryFee.toFixed(0)}`}
                 </span>
               </div>
 
+              <div className="flex items-center justify-between text-base font-extrabold text-[#243019] pt-1">
+                <span>Grand Total</span>
+                <span className="text-[#315B0B] text-xl font-black">
+                  ₹{cartTotal.toFixed(0)}
+                </span>
+              </div>
+
+              {cartSubtotal < minOrderValue && (
+                <div className="bg-amber-100/80 border border-amber-300 text-amber-900 rounded-xl p-2.5 text-xs font-bold flex items-center space-x-2">
+                  <Info size={14} className="text-amber-700 shrink-0" />
+                  <span>Minimum delivery order is ₹{minOrderValue}. Add ₹{minOrderValue - cartSubtotal} more to place order.</span>
+                </div>
+              )}
+
               <button
                 onClick={checkout}
-                className="w-full py-4 rounded-full bg-[#315B0B] hover:bg-[#244507] text-white font-black text-sm sm:text-base tracking-wider uppercase shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98] flex items-center justify-center space-x-2"
+                disabled={cartSubtotal < minOrderValue}
+                className={`w-full py-4 rounded-full font-black text-sm sm:text-base tracking-wider uppercase shadow-md transition-all duration-200 flex items-center justify-center space-x-2 ${
+                  cartSubtotal >= minOrderValue
+                    ? 'bg-[#315B0B] hover:bg-[#244507] text-white hover:shadow-lg active:scale-[0.98]'
+                    : 'bg-stone-300 text-stone-500 cursor-not-allowed'
+                }`}
               >
                 <span>PROCEED TO CHECKOUT</span>
                 <ArrowRight size={18} />

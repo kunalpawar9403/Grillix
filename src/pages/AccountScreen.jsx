@@ -13,7 +13,9 @@ import {
   ShoppingBag, 
   Clock, 
   ArrowRight,
-  RotateCcw
+  RotateCcw,
+  Shield,
+  ExternalLink
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { RESTAURANTS } from '../data/mockData';
@@ -28,6 +30,9 @@ export const AccountScreen = () => {
     logout, 
     login, 
     reorder,
+    allUsers = [],
+    switchUser,
+    resetAllData,
     showToast 
   } = useApp();
 
@@ -65,8 +70,8 @@ export const AccountScreen = () => {
 
   const handleQuickDemoLogin = () => {
     login({
-      fullName: 'Jhon Snow',
-      email: 'shahinurstk02@gmail.com',
+      fullName: 'Kunal Pawar',
+      email: 'kunalpawar9403@gmail.com',
       password: 'DemoPassword2026',
       dietary: ['Organic Greens', 'High Protein', 'Non-GMO']
     });
@@ -135,7 +140,7 @@ export const AccountScreen = () => {
                 className="w-full py-3 px-6 rounded-full bg-[#EEF4E3] hover:bg-[#E3EBD3] text-[#243019] border border-[#D0D8C2] font-bold text-xs flex items-center justify-center space-x-1.5 transition-all"
               >
                 <Sparkles size={14} className="text-[#315B0B]" />
-                <span>Quick Demo Sign In (Jhon Snow)</span>
+                <span>Quick Demo Sign In (Kunal Pawar)</span>
               </button>
             </div>
           </div>
@@ -247,6 +252,42 @@ export const AccountScreen = () => {
           </div>
         </div>
 
+        {/* Switch Active Indian User Account */}
+        <div className="bg-white rounded-3xl p-4 border border-[#D0D8C2] shadow-xs space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-black uppercase tracking-wider text-[#244507] flex items-center space-x-1.5">
+              <span>🇮🇳</span>
+              <span>Switch User Account:</span>
+            </span>
+            <button
+              onClick={resetAllData}
+              className="text-[10px] font-bold text-emerald-800 hover:text-emerald-900 bg-[#EEF4E3] hover:bg-[#E3EBD3] px-2.5 py-1 rounded-full border border-[#D0D8C2] transition-colors"
+              title="Reset application to fresh data"
+            >
+              🔄 Reset to Fresh Data
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {allUsers.map((u) => {
+              const isCurrent = currentUser?.email === u.email || currentUser?.name === u.name;
+              return (
+                <button
+                  key={u.id || u.email}
+                  onClick={() => switchUser(u.id)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5 ${
+                    isCurrent
+                      ? 'bg-[#244507] text-[#A8E83C] shadow-xs'
+                      : 'bg-[#EEF4E3] hover:bg-[#E3EBD3] text-[#243019] border border-[#D0D8C2]'
+                  }`}
+                >
+                  <span>{u.name}</span>
+                  <span className="text-[10px] opacity-75 font-normal">({u.city ? u.city.split(',')[0] : 'India'})</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Section Tabs: Profile Preferences vs Order History */}
         <div className="flex bg-[#E3EBD3] p-1 rounded-2xl border border-[#D0D8C2]">
           <button
@@ -307,6 +348,26 @@ export const AccountScreen = () => {
                   );
                 })}
               </div>
+            </div>
+
+            {/* Kitchen Admin Portal Banner Card */}
+            <div className="bg-gradient-to-r from-[#244507] to-[#315B0B] rounded-3xl p-5 text-white shadow-md flex items-center justify-between">
+              <div className="space-y-1 pr-3">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#A8E83C] bg-white/10 px-2.5 py-0.5 rounded-full inline-block">
+                  Restaurant Partner
+                </span>
+                <h4 className="text-sm sm:text-base font-black">Kitchen Admin & Live Operations</h4>
+                <p className="text-xs text-stone-200">Manage incoming orders, toggle live inventory, and view delivery fleet.</p>
+              </div>
+              <a
+                href="http://localhost:5175"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2.5 rounded-full bg-[#A8E83C] hover:bg-white text-[#244507] font-black text-xs shrink-0 shadow-xs transition-all active:scale-95 flex items-center space-x-1"
+                title="Launch Kitchen Admin Console on Port 5175"
+              >
+                <span>Open Admin Portal ↗</span>
+              </a>
             </div>
 
             {/* Account Menu Navigation */}
@@ -394,6 +455,36 @@ export const AccountScreen = () => {
                 <ChevronRight size={18} className="text-[#747B68]" />
               </button>
 
+              {/* Kitchen Partner Admin Console Link (Opens in New Tab on Port 5175) */}
+              <a
+                href="http://localhost:5175"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full p-3.5 flex items-center justify-between hover:bg-[#EEF4E3] rounded-2xl transition-colors text-left group bg-[#F5F8EF] border border-[#D0D8C2]"
+                title="Open Kitchen Partner Admin on Port 5175"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#244507] text-[#A8E83C] flex items-center justify-center shadow-xs">
+                    <Shield size={18} />
+                  </div>
+                  <div>
+                    <span className="text-xs sm:text-sm font-bold text-[#243019] flex items-center space-x-1.5">
+                      <span>Kitchen Partner Admin Portal</span>
+                      <span className="text-[10px] bg-[#244507] text-[#A8E83C] px-2 py-0.5 rounded-full font-black">
+                        Port 5175
+                      </span>
+                    </span>
+                    <span className="text-[11px] text-[#747B68] font-mono block">
+                      http://localhost:5175 (Opens in new tab)
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-1 text-xs font-bold text-[#315B0B] group-hover:underline">
+                  <span>Open Portal</span>
+                  <ExternalLink size={14} />
+                </div>
+              </a>
+
             </div>
           </>
         ) : (
@@ -439,7 +530,7 @@ export const AccountScreen = () => {
 
                       <div className="flex items-center justify-between sm:justify-end space-x-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#D0D8C2]/50">
                         <span className="text-sm font-extrabold text-[#244507] pr-1">
-                          ${order.total.toFixed(2)}
+                          ₹{order.total.toFixed(0)}
                         </span>
                         <button
                           onClick={() => reorder(order)}

@@ -26,7 +26,8 @@ export const MenuScreen = () => {
     searchQuery, 
     setSearchQuery, 
     cartItemCount, 
-    cartTotal 
+    cartTotal,
+    menuItems = FOOD_ITEMS
   } = useApp();
 
   const [activeCategory, setActiveCategory] = useState('Featured');
@@ -44,13 +45,13 @@ export const MenuScreen = () => {
   const diets = ['All', 'High Protein', 'Vegan', 'Gluten-Free', 'Organic'];
 
   const getCategoryCount = (catId) => {
-    if (catId === 'Featured') return FOOD_ITEMS.length;
-    return FOOD_ITEMS.filter((item) => 
+    if (catId === 'Featured') return menuItems.length;
+    return menuItems.filter((item) => 
       item.categories?.includes(catId) || item.category === catId
     ).length;
   };
 
-  const filteredItems = FOOD_ITEMS.filter((item) => {
+  const filteredItems = menuItems.filter((item) => {
     const matchesCategory = activeCategory === 'Featured' 
       ? true 
       : (item.categories?.includes(activeCategory) || item.category === activeCategory);
@@ -233,18 +234,29 @@ export const MenuScreen = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
 
-                {/* Top Badge */}
+                {/* Top Badge or Sold Out Badge */}
                 <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-                  <span className="bg-[#244507]/85 backdrop-blur-md text-[#A8E83C] text-[9px] sm:text-[10px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-white/15 shadow-sm truncate max-w-[95px] sm:max-w-none inline-block">
-                    {item.badge || item.category}
-                  </span>
+                  {item.isOutOfStock ? (
+                    <span className="bg-rose-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full shadow-md uppercase tracking-wider inline-block">
+                      Sold Out
+                    </span>
+                  ) : (
+                    <span className="bg-[#244507]/85 backdrop-blur-md text-[#A8E83C] text-[9px] sm:text-[10px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-white/15 shadow-sm truncate max-w-[95px] sm:max-w-none inline-block">
+                      {item.badge || item.category}
+                    </span>
+                  )}
                 </div>
 
                 {/* Floating Quick Add Circle Button */}
                 <button
+                  disabled={item.isOutOfStock}
                   onClick={(e) => handleQuickAdd(e, item)}
-                  className="absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/95 hover:bg-[#A8E83C] text-[#244507] backdrop-blur-md border border-white/80 flex items-center justify-center transition-all active:scale-90 shadow-md group-hover:scale-105"
-                  title={`Quick Add ${item.name}`}
+                  className={`absolute top-2 right-2 sm:top-3 sm:right-3 w-7 h-7 sm:w-9 sm:h-9 rounded-full backdrop-blur-md border border-white/80 flex items-center justify-center transition-all shadow-md ${
+                    item.isOutOfStock
+                      ? 'bg-stone-300 text-stone-500 cursor-not-allowed'
+                      : 'bg-white/95 hover:bg-[#A8E83C] text-[#244507] active:scale-90 group-hover:scale-105'
+                  }`}
+                  title={item.isOutOfStock ? "Item Sold Out" : `Quick Add ${item.name}`}
                   aria-label={`Quick Add ${item.name}`}
                 >
                   <Plus size={15} strokeWidth={2.8} />
@@ -253,7 +265,7 @@ export const MenuScreen = () => {
                 {/* Bottom Overlay Price & Calories */}
                 <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 flex items-center justify-between text-white">
                   <span className="text-sm sm:text-lg font-black text-[#A8E83C] drop-shadow-md">
-                    ${item.menuPrice.toFixed(2)}
+                    ₹{item.menuPrice.toFixed(0)}
                   </span>
                   <span className="text-[9px] sm:text-[11px] font-bold text-white/95 bg-black/45 backdrop-blur-md px-1.5 sm:px-2.5 py-0.5 rounded-full border border-white/10">
                     {item.calories} CALS
@@ -288,11 +300,16 @@ export const MenuScreen = () => {
                   </div>
 
                   <button
+                    disabled={item.isOutOfStock}
                     onClick={(e) => handleQuickAdd(e, item)}
-                    className="text-[11px] sm:text-xs font-black text-[#315B0B] hover:text-[#244507] flex items-center space-x-0.5 shrink-0"
+                    className={`text-[11px] sm:text-xs font-black flex items-center space-x-0.5 shrink-0 ${
+                      item.isOutOfStock
+                        ? 'text-rose-500 cursor-not-allowed'
+                        : 'text-[#315B0B] hover:text-[#244507]'
+                    }`}
                   >
-                    <span>Add</span>
-                    <ShoppingBag size={12} />
+                    <span>{item.isOutOfStock ? 'Sold Out' : 'Add'}</span>
+                    {!item.isOutOfStock && <ShoppingBag size={12} />}
                   </button>
                 </div>
               </div>

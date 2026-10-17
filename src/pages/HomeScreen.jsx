@@ -376,7 +376,7 @@ export const HomeScreen = () => {
                   {/* Category or Tag Badge */}
                   <div className="absolute top-3 left-3">
                     <span className="bg-[#244507]/75 backdrop-blur-sm text-[#A8E83C] text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/10">
-                      ${item.menuPrice.toFixed(2)}
+                      ₹{item.menuPrice.toFixed(0)}
                     </span>
                   </div>
 

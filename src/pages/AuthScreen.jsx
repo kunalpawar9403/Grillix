@@ -38,10 +38,10 @@ export const AuthScreen = () => {
   };
 
   const handleQuickDemo = () => {
-    setEmail('shahinurstk02@gmail.com');
+    setEmail('kunalpawar9403@gmail.com');
     setPassword('FreshLiving2026!');
-    setFullName('Jhon Snow');
-    showToast('Loaded demo credentials for Jhon Snow');
+    setFullName('Kunal Pawar');
+    showToast('Loaded demo credentials for Kunal Pawar');
   };
 
   const handleSubmit = (e) => {
@@ -60,7 +60,7 @@ export const AuthScreen = () => {
       });
     } else {
       login({
-        fullName: fullName || (email.toLowerCase().includes('jhon') ? 'Jhon Snow' : email.split('@')[0]),
+        fullName: fullName || (email.toLowerCase().includes('kunal') ? 'Kunal Pawar' : email.split('@')[0]),
         email,
         password,
         dietary: selectedDiet
@@ -152,8 +152,8 @@ export const AuthScreen = () => {
             <button
               onClick={() => {
                 login({
-                  fullName: 'Jhon Snow',
-                  email: 'shahinurstk02@gmail.com',
+                  fullName: 'Kunal Pawar',
+                  email: 'kunalpawar9403@gmail.com',
                   password: 'AppleSecureAuth',
                   dietary: selectedDiet
                 });
@@ -170,8 +170,8 @@ export const AuthScreen = () => {
             <button
               onClick={() => {
                 login({
-                  fullName: 'Jhon Snow',
-                  email: 'shahinurstk02@gmail.com',
+                  fullName: 'Kunal Pawar',
+                  email: 'kunalpawar9403@gmail.com',
                   password: 'GoogleSecureAuth',
                   dietary: selectedDiet
                 });
@@ -207,7 +207,7 @@ export const AuthScreen = () => {
                   <input
                     type="text"
                     required
-                    placeholder="Jhon Snow"
+                    placeholder="Kunal Pawar"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full bg-[#EEF4E3] rounded-2xl pl-10 pr-4 py-3 text-xs sm:text-sm text-[#243019] placeholder-[#747B68] border border-[#D0D8C2] focus:outline-none focus:border-[#315B0B] font-semibold"
