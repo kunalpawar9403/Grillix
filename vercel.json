@@ -2,8 +2,17 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/admin", "destination": "/admin/index.html" },
-    { "source": "/admin/((?!assets).*)", "destination": "/admin/index.html" },
-    { "source": "/((?!api|admin|assets).*)$", "destination": "/index.html" }
+    {
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/admin/((?!assets).*)",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/((?!api|admin|assets).*)$",
+      "destination": "/index.html"
+    }
   ]
 }
